@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PlanRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Plan
 {
     #[ORM\Id]
@@ -51,6 +52,9 @@ class Plan
      */
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'plan', orphanRemoval: true)]
     private Collection $users;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $created_at = null;
 
     public function __construct()
     {
@@ -210,5 +214,17 @@ class Plan
         }
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->created_at;
+    }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        // C'est ici qu'on définit la date automatiquement
+        $this->created_at = new \DateTimeImmutable();
     }
 }
