@@ -1,0 +1,13 @@
+{# templates/pdf/generate_pdf.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Generate PDF{% endblock %}
+
+{% block body %}
+    <h1>Générer un PDF</h1>
+
+    {{ form_start(form, { 'attr': { 'data-turbo': 'false' } }) }}
+        {{ form_widget(form) }}
+    {{ form_end(form) }}
+{% endblock %}
