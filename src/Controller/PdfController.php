@@ -4,46 +4,42 @@ namespace App\Controller;
 
 use App\Service\PdfGeneratorService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class PdfController extends AbstractController
 {
     #[Route('/pdf/generate', name: 'app_pdf_generate')]
-    public function generate(PdfGeneratorService $pdfGenerator): Response
+    #[IsGranted('ROLE_USER')]
+    public function generate(Request $request, PdfGeneratorService $pdfGenerator): Response
     {
-        // Votre contenu HTML
-        $htmlContent = '
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>Mon PDF</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        padding: 20px;
-                    }
-                    h1 {
-                        color: #333;
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>Bonjour depuis Gotenberg!</h1>
-                <p>Ceci est un PDF généré dynamiquement.</p>
-                <p>Date de génération: ' . date('d/m/Y H:i:s') . '</p>
-            </body>
-            </html>
-        ';
+        $form = $this->createFormBuilder()
+            ->add('url', UrlType::class, [
+                'label' => 'URL du site à transformer en PDF',
+                'attr' => ['placeholder' => 'https://example.com']
+            ])
+            ->add('submit', SubmitType::class, ['label' => 'Générer le PDF'])
+            ->getForm();
 
-        // Générez le PDF
-        $pdfContent = $pdfGenerator->generatePdfFromHtml($htmlContent);
+        $form->handleRequest($request);
 
-        // Retournez le PDF comme réponse
-        return new Response($pdfContent, 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="document.pdf"'
+        if ($form->isSubmitted() && $form->isValid()) {
+            $url = $form->getData()['url'];
+
+            $pdfContent = $pdfGenerator->generatePdfFromUrl($url);
+
+            return new Response($pdfContent, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="generation.pdf"'
+            ]);
+        }
+
+        return $this->render('pdf/generate_pdf.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 }
