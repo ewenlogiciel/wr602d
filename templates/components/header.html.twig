@@ -1,0 +1,154 @@
+<header class="header-bar">
+    <div class="header-inner">
+        {# ── Left: Logo + Navigation ── #}
+        <div class="flex items-center gap-10">
+            <a href="/" class="header-logo group">
+                <span class="header-logo-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="url(#logo-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="14,2 14,8 20,8" stroke="url(#logo-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logo-grad" x1="4" y1="2" x2="20" y2="22">
+                                <stop offset="0%" stop-color="#ff3b30"/>
+                                <stop offset="100%" stop-color="#ff8c42"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </span>
+                <span class="header-logo-text">
+                    <span class="header-logo-poly">poly</span><span class="header-logo-pdf">pdf</span>
+                </span>
+            </a>
+
+            <nav class="header-nav">
+                <a href="{{ path('app_pdf_generate') }}" class="header-nav-link">
+                    <svg class="header-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+                        <path d="M12 12v9"/>
+                        <path d="m8 17 4-5 4 5"/>
+                    </svg>
+                    Convertir
+                </a>
+                <a href="{{ path('app_pdf_generate') }}" class="header-nav-link">
+                    <svg class="header-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                    Outils
+                </a>
+                <a href="{{ path('app_pdf_generate') }}" class="header-nav-link">
+                    <svg class="header-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    Contacts
+                </a>
+                <a href="{{ path('app_pdf_generate') }}" class="header-nav-link">
+                    <svg class="header-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    Historique
+                </a>
+            </nav>
+        </div>
+
+        {# ── Right: Profile area ── #}
+        <div class="flex items-center gap-3">
+            <div class="relative" data-controller="dropdown">
+
+                {% if app.user %}
+                    {# ── Logged in state ── #}
+                    {% set planName = app.user.plan ? app.user.plan.name|lower : 'free' %}
+                    <button data-action="click->dropdown#toggle" class="header-profile-btn" aria-label="Menu profil">
+                        <span class="header-plan-badge header-plan-badge--{{ planName }}">
+                            {{ planName|capitalize }}
+                        </span>
+                        <span class="header-avatar">
+                            {% if app.user.photo %}
+                                <img src="{{ app.user.photo }}" alt="Photo de profil" class="header-avatar-img"/>
+                            {% else %}
+                                <span class="header-avatar-fallback">
+                                    {{ app.user.firstname|first|upper }}
+                                </span>
+                            {% endif %}
+                        </span>
+                        <svg class="header-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
+
+                    {# ── Logged in dropdown ── #}
+                    <div data-dropdown-target="menu" class="header-dropdown header-dropdown--hidden">
+                        <div class="header-dropdown-header">
+                            <p class="header-dropdown-name">{{ app.user.firstname }} {{ app.user.lastname }}</p>
+                            <p class="header-dropdown-email">{{ app.user.email }}</p>
+                        </div>
+                        <div class="header-dropdown-divider"></div>
+                        <a href="{{ path('app_pdf_generate') }}" class="header-dropdown-item">
+                            <svg class="header-dropdown-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            Mon profil
+                        </a>
+                        <a href="{{ path('app_logout') }}" class="header-dropdown-item header-dropdown-item--danger">
+                            <svg class="header-dropdown-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                <polyline points="16 17 21 12 16 7"/>
+                                <line x1="21" y1="12" x2="9" y2="12"/>
+                            </svg>
+                            Déconnexion
+                        </a>
+                    </div>
+
+                {% else %}
+                    {# ── Logged out state ── #}
+                    <button data-action="click->dropdown#toggle" class="header-guest-btn" aria-label="Menu connexion">
+                        <svg class="header-guest-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </button>
+
+                    {# ── Logged out dropdown ── #}
+                    <div data-dropdown-target="menu" class="header-dropdown header-dropdown--hidden">
+                        <a href="{{ path('app_login') }}" class="header-dropdown-item">
+                            <svg class="header-dropdown-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                                <polyline points="10 17 15 12 10 7"/>
+                                <line x1="15" y1="12" x2="3" y2="12"/>
+                            </svg>
+                            Connexion
+                        </a>
+                        <a href="{{ path('app_register') }}" class="header-dropdown-item">
+                            <svg class="header-dropdown-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="8.5" cy="7" r="4"/>
+                                <line x1="20" y1="8" x2="20" y2="14"/>
+                                <line x1="23" y1="11" x2="17" y2="11"/>
+                            </svg>
+                            Inscription
+                        </a>
+                    </div>
+                {% endif %}
+
+            </div>
+
+            {# ── Mobile menu toggle ── #}
+            <button class="header-mobile-toggle" aria-label="Menu" onclick="document.querySelector('.header-mobile-nav').classList.toggle('header-mobile-nav--open')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    {# ── Mobile navigation ── #}
+    <nav class="header-mobile-nav">
+        <a href="{{ path('app_pdf_generate') }}" class="header-mobile-link">Convertir</a>
+        <a href="{{ path('app_pdf_generate') }}" class="header-mobile-link">Outils</a>
+        <a href="{{ path('app_pdf_generate') }}" class="header-mobile-link">Contacts</a>
+        <a href="{{ path('app_pdf_generate') }}" class="header-mobile-link">Historique</a>
+    </nav>
+</header>

@@ -1,8 +1,246 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    <h1>Bienvenue {{ app.user.firstname }} !</h1>
-    <p>Vous êtes maintenant connecté.</p>
+{% block title %}PDFactory — Convertissez tout en PDF{% endblock %}
 
-    <a href="{{ path('app_logout') }}">Se déconnecter</a>
+{% block body %}
+<div class="relative min-h-screen overflow-hidden">
+
+    {# ── Background effects ── #}
+    <div class="pointer-events-none absolute inset-0">
+        <div class="absolute top-[-20%] left-[10%] h-[600px] w-[600px] rounded-full bg-[#ff3b30]/[0.04] blur-[120px] animate-float"></div>
+        <div class="absolute bottom-[-10%] right-[5%] h-[500px] w-[500px] rounded-full bg-[#4a9eff]/[0.05] blur-[100px] animate-float delay-300"></div>
+        <div class="absolute top-[30%] right-[20%] h-[300px] w-[300px] rounded-full bg-[#ff6b35]/[0.03] blur-[80px] animate-float delay-600"></div>
+    </div>
+
+    {# ── Noise overlay ── #}
+    <div class="pointer-events-none absolute inset-0 opacity-[0.03]"
+         style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E'); background-repeat: repeat; background-size: 256px 256px;">
+    </div>
+
+
+    {# ── Hero section ── #}
+    <section class="relative z-10 mx-auto max-w-5xl px-8 pt-24 pb-20 text-center lg:pt-36 lg:pb-28">
+
+        <h1 class="font-heading text-5xl leading-[1.08] font-800 tracking-tight text-white md:text-6xl lg:text-7xl animate-fade-up delay-100">
+            Convertissez n'importe quel<br class="hidden md:block"> contenu
+            <span class="bg-gradient-to-r from-[#ff3b30] via-[#ff6b35] to-[#ffb340] bg-clip-text text-transparent">en PDF</span>,
+            instantanément.
+        </h1>
+
+        <p class="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-muted md:text-xl animate-fade-up delay-200">
+            Que vous ayez une URL, du code HTML, un fichier Markdown ou du simple texte brut,
+            notre moteur transforme votre source en un document PDF propre, standardisé et fidèle
+            à votre mise en page originale.
+        </p>
+
+        {% if app.user %}
+            <div class="mt-10 animate-fade-up delay-300">
+                <a href="{{ path('app_pdf_generate') }}"
+                   class="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] px-8 py-3.5 text-base font-600 text-white shadow-xl shadow-[#ff3b30]/20 transition-all hover:shadow-2xl hover:shadow-[#ff3b30]/30 hover:scale-[1.02]">
+                    Générer un PDF
+                    <svg class="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                </a>
+            </div>
+        {% endif %}
+
+        {# ── Formats badges ── #}
+        <div class="mt-14 flex flex-wrap items-center justify-center gap-3 animate-fade-up delay-400">
+            {% set formats = [
+                { label: 'URL', icon: '🔗' },
+                { label: 'HTML', icon: '&lt;/&gt;' },
+                { label: 'Markdown', icon: '#' },
+                { label: 'Texte brut', icon: 'Aa' }
+            ] %}
+            {% for format in formats %}
+                <div class="flex items-center gap-2 rounded-lg border border-border bg-surface/40 px-4 py-2 text-sm text-muted backdrop-blur-sm">
+                    <span class="text-xs opacity-60">{{ format.icon|raw }}</span>
+                    {{ format.label }}
+                </div>
+            {% endfor %}
+            <div class="flex items-center gap-1.5 text-sm text-muted/60">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+                <span class="font-600 text-white/80">PDF</span>
+            </div>
+        </div>
+    </section>
+
+    {# ── Pricing section ── #}
+    <section class="relative z-10 mx-auto max-w-6xl px-8 pb-32">
+        <div class="mb-14 text-center animate-fade-up delay-300">
+            <h2 class="font-heading text-3xl font-800 tracking-tight text-white md:text-4xl">
+                Un plan pour chaque besoin
+            </h2>
+            <p class="mt-4 text-muted">
+                Commencez gratuitement, montez en puissance quand vous le souhaitez.
+            </p>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-3">
+            {% for plan in plans %}
+                {% set is_popular = plan.name == 'BASIC' %}
+                {% set is_premium = plan.name == 'PREMIUM' %}
+
+                <div class="animate-fade-up delay-{{ loop.index * 200 + 300 }} group relative flex flex-col rounded-2xl border transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1
+                    {% if is_popular %}
+                        border-[#ff3b30]/30 bg-gradient-to-b from-[#ff3b30]/[0.08] to-surface shadow-xl shadow-[#ff3b30]/[0.06]
+                    {% else %}
+                        border-border bg-surface hover:border-border-hover
+                    {% endif %}
+                    ">
+
+                    {# Popular badge #}
+                    {% if is_popular %}
+                        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                            <span class="rounded-full bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] px-4 py-1 text-xs font-600 text-white shadow-lg shadow-[#ff3b30]/30">
+                                Populaire
+                            </span>
+                        </div>
+                    {% endif %}
+
+                    <div class="flex flex-1 flex-col p-8">
+                        {# Plan header #}
+                        <div class="mb-6">
+                            <div class="mb-3 flex items-center gap-3">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-xl
+                                    {% if plan.name == 'FREE' %}
+                                        bg-[#ffffff08] text-muted
+                                    {% elseif is_popular %}
+                                        bg-[#ff3b30]/15 text-[#ff3b30]
+                                    {% else %}
+                                        bg-[#4a9eff]/15 text-[#4a9eff]
+                                    {% endif %}
+                                ">
+                                    {% if plan.name == 'FREE' %}
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                                        </svg>
+                                    {% elseif is_popular %}
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                                        </svg>
+                                    {% else %}
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.841m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                                        </svg>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h3 class="font-heading text-lg font-600 text-white">{{ plan.name }}</h3>
+                                </div>
+                            </div>
+                            <p class="text-sm leading-relaxed text-muted">{{ plan.description }}</p>
+                        </div>
+
+                        {# Price #}
+                        <div class="mb-8">
+                            <div class="flex items-baseline gap-1">
+                                {% if plan.price == 0 %}
+                                    <span class="font-heading text-4xl font-800 text-white">Gratuit</span>
+                                {% else %}
+                                    <span class="font-heading text-4xl font-800 text-white">{{ plan.price|number_format(0, ',', ' ') }}€</span>
+                                    <span class="text-sm text-muted">/mois</span>
+                                {% endif %}
+                            </div>
+                            {% if plan.specialPrice %}
+                                <div class="mt-1.5 text-sm text-[#34c759]">
+                                    Offre spéciale : {{ plan.specialPrice|number_format(2, ',', ' ') }}€
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {# Features #}
+                        <ul class="mb-8 flex flex-1 flex-col gap-3">
+                            <li class="flex items-center gap-3 text-sm">
+                                <svg class="h-4 w-4 shrink-0 {% if is_popular %}text-[#ff3b30]{% elseif is_premium %}text-[#4a9eff]{% else %}text-muted{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
+                                <span class="text-[#c8c8d4]"><strong class="text-white">{{ plan.usageLimit }}</strong> générations / jour</span>
+                            </li>
+                            <li class="flex items-center gap-3 text-sm">
+                                <svg class="h-4 w-4 shrink-0 {% if is_popular %}text-[#ff3b30]{% elseif is_premium %}text-[#4a9eff]{% else %}text-muted{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
+                                <span class="text-[#c8c8d4]">Conversion URL vers PDF</span>
+                            </li>
+                            <li class="flex items-center gap-3 text-sm">
+                                <svg class="h-4 w-4 shrink-0 {% if is_popular %}text-[#ff3b30]{% elseif is_premium %}text-[#4a9eff]{% else %}text-muted{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
+                                <span class="text-[#c8c8d4]">Moteur Gotenberg</span>
+                            </li>
+                            {% if is_popular or is_premium %}
+                                <li class="flex items-center gap-3 text-sm">
+                                    <svg class="h-4 w-4 shrink-0 {% if is_popular %}text-[#ff3b30]{% else %}text-[#4a9eff]{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                    </svg>
+                                    <span class="text-[#c8c8d4]">Support prioritaire</span>
+                                </li>
+                            {% endif %}
+                            {% if is_premium %}
+                                <li class="flex items-center gap-3 text-sm">
+                                    <svg class="h-4 w-4 shrink-0 text-[#4a9eff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                    </svg>
+                                    <span class="text-[#c8c8d4]">Accès API dédié</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+
+                        {# CTA button #}
+                        {% if app.user %}
+                            <a href="{{ path('app_pdf_generate') }}"
+                               class="block w-full rounded-xl py-3 text-center text-sm font-600 transition-all duration-200
+                               {% if is_popular %}
+                                   bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] text-white shadow-lg shadow-[#ff3b30]/20 hover:shadow-xl hover:shadow-[#ff3b30]/30
+                               {% elseif is_premium %}
+                                   bg-[#4a9eff] text-white shadow-lg shadow-[#4a9eff]/20 hover:shadow-xl hover:shadow-[#4a9eff]/30
+                               {% else %}
+                                   border border-border-hover bg-surface-light text-white hover:bg-[#22222e]
+                               {% endif %}
+                               ">
+                                Commencer
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_register') }}"
+                               class="block w-full rounded-xl py-3 text-center text-sm font-600 transition-all duration-200
+                               {% if is_popular %}
+                                   bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] text-white shadow-lg shadow-[#ff3b30]/20 hover:shadow-xl hover:shadow-[#ff3b30]/30
+                               {% elseif is_premium %}
+                                   bg-[#4a9eff] text-white shadow-lg shadow-[#4a9eff]/20 hover:shadow-xl hover:shadow-[#4a9eff]/30
+                               {% else %}
+                                   border border-border-hover bg-surface-light text-white hover:bg-[#22222e]
+                               {% endif %}
+                               ">
+                                {% if plan.price == 0 %}
+                                    Démarrer gratuitement
+                                {% else %}
+                                    Choisir ce plan
+                                {% endif %}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    {# ── Footer ── #}
+    <footer class="relative z-10 border-t border-border px-8 py-8">
+        <div class="mx-auto flex max-w-6xl items-center justify-between">
+            <div class="flex items-center gap-2 text-sm text-muted">
+                <div class="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-[#ff3b30] to-[#ff6b35]">
+                    <svg class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                </div>
+                PDFactory
+            </div>
+            <p class="text-xs text-muted/60">© {{ "now"|date("Y") }} PDFactory. Tous droits réservés.</p>
+        </div>
+    </footer>
+</div>
 {% endblock %}
