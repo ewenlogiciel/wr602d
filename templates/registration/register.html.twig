@@ -1,19 +1,249 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription — PDFactory{% endblock %}
 
 {% block body %}
-    <h1>Register</h1>
+<div class="grid min-h-[calc(100vh-64px)] lg:grid-cols-[5fr_6fr]">
 
-    {{ form_errors(registrationForm) }}
+    {# ════════════════════════════════════
+       Panneau gauche — décoratif
+    ════════════════════════════════════ #}
+    <div class="relative hidden overflow-hidden border-r border-white/[0.05] bg-gradient-to-br from-[#0f0f1a] via-[#0a0a12] to-[#0d0810] lg:flex lg:flex-col lg:justify-center lg:px-14 lg:py-16">
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+        {# Orbes #}
+        <div class="animate-float pointer-events-none absolute -right-[18%] -top-[12%] h-[380px] w-[380px] rounded-full bg-[#ff3b30]/[0.08] blur-[90px]"></div>
+        <div class="animate-float pointer-events-none absolute -left-[12%] bottom-[5%] h-[300px] w-[300px] rounded-full bg-[#4a9eff]/[0.06] blur-[90px] delay-[3500ms]"></div>
+        <div class="animate-float pointer-events-none absolute right-[5%] top-[55%] h-[200px] w-[200px] rounded-full bg-[#ff6b35]/[0.05] blur-[70px] delay-[1500ms]"></div>
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+        <div class="relative z-10">
+
+            {# Marque #}
+            <div class="mb-14 flex items-center gap-2.5">
+                <div class="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] border border-[#ff3b30]/20 bg-gradient-to-br from-[#ff3b30]/[0.14] to-[#ff8c42]/[0.09]">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                              stroke="url(#rpg)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="14 2 14 8 20 8"
+                                  stroke="url(#rpg)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="rpg" x1="4" y1="2" x2="20" y2="22">
+                                <stop offset="0%" stop-color="#ff3b30"/>
+                                <stop offset="100%" stop-color="#ff8c42"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span class="font-heading text-[1.25rem] font-extrabold tracking-[-0.03em]">
+                    <span class="text-white">poly</span><span class="bg-gradient-to-br from-[#ff3b30] to-[#ff8c42] bg-clip-text text-transparent">pdf</span>
+                </span>
+            </div>
+
+            {# Tagline #}
+            <h2 class="font-heading text-[2.1rem] font-extrabold leading-[1.12] tracking-[-0.035em] text-white">
+                Convertissez tout
+                en <span class="bg-gradient-to-br from-[#ff3b30] to-[#ff8c42] bg-clip-text text-transparent">PDF</span><br>
+                instantanément.
+            </h2>
+
+            <p class="mt-5 text-[0.88rem] leading-[1.75] text-white/[0.38]">
+                URL, HTML, Markdown ou texte brut — notre moteur Gotenberg génère des documents propres et fidèles à votre mise en page.
+            </p>
+
+            {# Cartes de conversion #}
+            <div class="mt-11 flex flex-col gap-2.5">
+
+                <div class="flex items-center gap-3.5 rounded-xl border border-white/[0.055] bg-white/[0.025] px-4 py-3 transition-colors hover:border-white/[0.09] hover:bg-white/[0.04]">
+                    <div class="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg border border-[#ff3b30]/20 bg-[#ff3b30]/[0.12] text-[0.95rem]">🔗</div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[0.78rem] font-semibold tracking-[0.02em] text-white/75">URL</p>
+                        <p class="truncate text-[0.69rem] text-white/30">https://monsite.fr/rapport</p>
+                    </div>
+                    <span class="shrink-0 rounded-[5px] border border-white/[0.07] bg-white/[0.04] px-2 py-[3px] text-[0.67rem] font-bold uppercase tracking-[0.06em] text-white/25">→ PDF</span>
+                </div>
+
+                <div class="flex items-center gap-3.5 rounded-xl border border-white/[0.055] bg-white/[0.025] px-4 py-3 transition-colors hover:border-white/[0.09] hover:bg-white/[0.04]">
+                    <div class="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg border border-[#ff6b35]/20 bg-[#ff6b35]/[0.12]">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,107,53,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[0.78rem] font-semibold tracking-[0.02em] text-white/75">HTML / CSS</p>
+                        <p class="truncate text-[0.69rem] text-white/30">Template personnalisé</p>
+                    </div>
+                    <span class="shrink-0 rounded-[5px] border border-white/[0.07] bg-white/[0.04] px-2 py-[3px] text-[0.67rem] font-bold uppercase tracking-[0.06em] text-white/25">→ PDF</span>
+                </div>
+
+                <div class="flex items-center gap-3.5 rounded-xl border border-white/[0.055] bg-white/[0.025] px-4 py-3 transition-colors hover:border-white/[0.09] hover:bg-white/[0.04]">
+                    <div class="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg border border-[#4a9eff]/20 bg-[#4a9eff]/[0.12]">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(74,158,255,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[0.78rem] font-semibold tracking-[0.02em] text-white/75">Markdown</p>
+                        <p class="truncate text-[0.69rem] text-white/30">Document structuré</p>
+                    </div>
+                    <span class="shrink-0 rounded-[5px] border border-white/[0.07] bg-white/[0.04] px-2 py-[3px] text-[0.67rem] font-bold uppercase tracking-[0.06em] text-white/25">→ PDF</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {# ════════════════════════════════════
+       Panneau droit — formulaire
+    ════════════════════════════════════ #}
+    <div class="flex items-center justify-center bg-[#08080c] px-6 py-12">
+        <div class="animate-fade-up w-full max-w-[440px]">
+
+            <h1 class="font-heading text-[1.75rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-white">
+                Créer un compte
+            </h1>
+            <p class="mt-2 mb-8 text-[0.85rem] text-white/40">
+                Commencez à convertir gratuitement dès aujourd'hui.
+            </p>
+
+            {# Erreurs globales #}
+            {% set formErrors = form_errors(registrationForm) %}
+            {% if formErrors %}
+                <div class="mb-5 rounded-xl border border-[#ff4444]/20 bg-[#ff4444]/[0.07] px-4 py-3 text-[0.8rem] leading-relaxed text-[#ff6b6b]">
+                    {{ formErrors }}
+                </div>
+            {% endif %}
+
+            {{ form_start(registrationForm) }}
+
+                {# ── Prénom + Nom ── #}
+                <div class="mb-3.5 grid grid-cols-2 gap-3">
+                    <div class="flex flex-col gap-1.5">
+                        {{ form_label(registrationForm.firstname, 'Prénom', {
+                            'label_attr': {'class': 'text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50'}
+                        }) }}
+                        {{ form_widget(registrationForm.firstname, {
+                            'attr': {'class': 'w-full rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-[0.875rem] text-[#f0f0f5] outline-none transition-all placeholder:text-white/20 focus:border-[#ff3b30]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#ff3b30]/[0.07]', 'placeholder': 'Jean'}
+                        }) }}
+                        <div class="text-[0.72rem] text-[#ff5555] [&_ul]:list-none [&_ul]:p-0 [&_li]:before:mr-1 [&_li]:before:opacity-60 [&_li]:before:content-['↳']">
+                            {{ form_errors(registrationForm.firstname) }}
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        {{ form_label(registrationForm.lastname, 'Nom', {
+                            'label_attr': {'class': 'text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50'}
+                        }) }}
+                        {{ form_widget(registrationForm.lastname, {
+                            'attr': {'class': 'w-full rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-[0.875rem] text-[#f0f0f5] outline-none transition-all placeholder:text-white/20 focus:border-[#ff3b30]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#ff3b30]/[0.07]', 'placeholder': 'Dupont'}
+                        }) }}
+                        <div class="text-[0.72rem] text-[#ff5555] [&_ul]:list-none [&_ul]:p-0 [&_li]:before:mr-1 [&_li]:before:opacity-60 [&_li]:before:content-['↳']">
+                            {{ form_errors(registrationForm.lastname) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# ── Email ── #}
+                <div class="mb-3.5 flex flex-col gap-1.5">
+                    {{ form_label(registrationForm.email, 'Adresse e-mail', {
+                        'label_attr': {'class': 'text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50'}
+                    }) }}
+                    {{ form_widget(registrationForm.email, {
+                        'attr': {'class': 'w-full rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-[0.875rem] text-[#f0f0f5] outline-none transition-all placeholder:text-white/20 focus:border-[#ff3b30]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#ff3b30]/[0.07]', 'placeholder': 'jean@exemple.com'}
+                    }) }}
+                    <div class="text-[0.72rem] text-[#ff5555] [&_ul]:list-none [&_ul]:p-0 [&_li]:before:mr-1 [&_li]:before:opacity-60 [&_li]:before:content-['↳']">
+                        {{ form_errors(registrationForm.email) }}
+                    </div>
+                </div>
+
+                {# ── Date de naissance ── #}
+                <div class="mb-3.5 flex flex-col gap-1.5">
+                    {{ form_label(registrationForm.dob, 'Date de naissance', {
+                        'label_attr': {'class': 'text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50'}
+                    }) }}
+                    {{ form_widget(registrationForm.dob, {
+                        'attr': {'class': 'w-full rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-[0.875rem] text-[#f0f0f5] outline-none transition-all focus:border-[#ff3b30]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#ff3b30]/[0.07] [color-scheme:dark]'}
+                    }) }}
+                    <div class="text-[0.72rem] text-[#ff5555] [&_ul]:list-none [&_ul]:p-0 [&_li]:before:mr-1 [&_li]:before:opacity-60 [&_li]:before:content-['↳']">
+                        {{ form_errors(registrationForm.dob) }}
+                    </div>
+                </div>
+
+                {# ── Mot de passe ── #}
+                <div class="mb-3.5 flex flex-col gap-1.5">
+                    {{ form_label(registrationForm.plainPassword, 'Mot de passe', {
+                        'label_attr': {'class': 'text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50'}
+                    }) }}
+                    {{ form_widget(registrationForm.plainPassword, {
+                        'attr': {'class': 'w-full rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-[0.875rem] text-[#f0f0f5] outline-none transition-all placeholder:text-white/20 focus:border-[#ff3b30]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#ff3b30]/[0.07]', 'placeholder': '6 caractères minimum'}
+                    }) }}
+                    <div class="text-[0.72rem] text-[#ff5555] [&_ul]:list-none [&_ul]:p-0 [&_li]:before:mr-1 [&_li]:before:opacity-60 [&_li]:before:content-['↳']">
+                        {{ form_errors(registrationForm.plainPassword) }}
+                    </div>
+                </div>
+
+                {# ── Forfait ── #}
+                <div class="mb-3.5 flex flex-col gap-1.5">
+                    {{ form_label(registrationForm.plan, 'Forfait', {
+                        'label_attr': {'class': 'text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50'}
+                    }) }}
+                    <div class="relative">
+                        {{ form_widget(registrationForm.plan, {
+                            'attr': {'class': 'w-full appearance-none rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-3 pr-10 text-[0.875rem] text-[#f0f0f5] outline-none transition-all focus:border-[#ff3b30]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#ff3b30]/[0.07] cursor-pointer [&_option]:bg-[#1a1a24]'}
+                        }) }}
+                        <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-[0.72rem] text-[#ff5555] [&_ul]:list-none [&_ul]:p-0 [&_li]:before:mr-1 [&_li]:before:opacity-60 [&_li]:before:content-['↳']">
+                        {{ form_errors(registrationForm.plan) }}
+                    </div>
+                </div>
+
+                {# ── Séparateur ── #}
+                <div class="my-5 h-px bg-white/[0.055]"></div>
+
+                {# ── CGU ── #}
+                <div class="mb-5 flex flex-col gap-2">
+                    <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-colors hover:border-white/[0.10] hover:bg-white/[0.04]">
+                        {# Checkbox custom avec peer #}
+                        <div class="relative mt-0.5 h-[17px] w-[17px] shrink-0 rounded-[5px]">
+                            {{ form_widget(registrationForm.agreeTerms, {
+                                'attr': {'class': 'peer absolute inset-0 m-0 h-full w-full cursor-pointer opacity-0'}
+                            }) }}
+                            <div class="absolute inset-0 rounded-[5px] border border-white/20 transition-all peer-checked:border-transparent peer-checked:bg-gradient-to-br peer-checked:from-[#ff3b30] peer-checked:to-[#ff6b35]"></div>
+                            <svg class="pointer-events-none absolute inset-0 m-auto h-[9px] w-[9px] text-white opacity-0 transition-opacity peer-checked:opacity-100" viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="1 4 3.5 6.5 9 1"/>
+                            </svg>
+                        </div>
+                        <span class="text-[0.8rem] leading-[1.55] text-white/42">
+                            J'accepte les <a href="#" class="font-medium text-[#ff6b35]/85 transition-colors hover:text-[#ff6b35] hover:underline">conditions d'utilisation</a>
+                            et la <a href="#" class="font-medium text-[#ff6b35]/85 transition-colors hover:text-[#ff6b35] hover:underline">politique de confidentialité</a>.
+                        </span>
+                    </label>
+                    <div class="text-[0.72rem] text-[#ff5555] [&_ul]:list-none [&_ul]:p-0 [&_li]:before:mr-1 [&_li]:before:opacity-60 [&_li]:before:content-['↳']">
+                        {{ form_errors(registrationForm.agreeTerms) }}
+                    </div>
+                </div>
+
+                {# ── Bouton submit ── #}
+                <button type="submit"
+                        class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] px-6 py-3.5 text-[0.9rem] font-semibold text-white shadow-lg shadow-[#ff3b30]/25 transition-all hover:shadow-xl hover:shadow-[#ff3b30]/35 active:translate-y-0">
+                    Créer mon compte
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+
+            {{ form_end(registrationForm) }}
+
+            <p class="mt-6 text-center text-[0.8rem] text-white/30">
+                Déjà un compte ?&nbsp;<a href="{{ path('app_login') }}" class="font-medium text-white/60 transition-colors hover:text-white">Se connecter</a>
+            </p>
+
+        </div>
+    </div>
+
+</div>
 {% endblock %}

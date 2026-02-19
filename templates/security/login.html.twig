@@ -1,34 +1,204 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Connexion — PDFactory{% endblock %}
 
 {% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+<div class="grid min-h-[calc(100vh-64px)] lg:grid-cols-[5fr_6fr]">
 
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
+    {# ════════════════════════════════════
+       Panneau gauche — décoratif
+    ════════════════════════════════════ #}
+    <div class="relative hidden overflow-hidden border-r border-white/[0.05] bg-gradient-to-br from-[#0f0f1a] via-[#0a0a12] to-[#0d0810] lg:flex lg:flex-col lg:justify-center lg:px-14 lg:py-16">
+
+        {# Orbes #}
+        <div class="animate-float pointer-events-none absolute -right-[18%] -top-[12%] h-[380px] w-[380px] rounded-full bg-[#ff3b30]/[0.08] blur-[90px]"></div>
+        <div class="animate-float pointer-events-none absolute -left-[12%] bottom-[5%] h-[300px] w-[300px] rounded-full bg-[#4a9eff]/[0.06] blur-[90px] delay-[3500ms]"></div>
+        <div class="animate-float pointer-events-none absolute right-[5%] top-[55%] h-[200px] w-[200px] rounded-full bg-[#ff6b35]/[0.05] blur-[70px] delay-[1500ms]"></div>
+
+        <div class="relative z-10">
+
+            {# Marque #}
+            <div class="mb-14 flex items-center gap-2.5">
+                <div class="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] border border-[#ff3b30]/20 bg-gradient-to-br from-[#ff3b30]/[0.14] to-[#ff8c42]/[0.09]">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                              stroke="url(#lpg)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="14 2 14 8 20 8"
+                                  stroke="url(#lpg)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="lpg" x1="4" y1="2" x2="20" y2="22">
+                                <stop offset="0%" stop-color="#ff3b30"/>
+                                <stop offset="100%" stop-color="#ff8c42"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span class="font-heading text-[1.25rem] font-extrabold tracking-[-0.03em]">
+                    <span class="text-white">poly</span><span class="bg-gradient-to-br from-[#ff3b30] to-[#ff8c42] bg-clip-text text-transparent">pdf</span>
+                </span>
+            </div>
+
+            {# Tagline #}
+            <h2 class="font-heading text-[2.1rem] font-extrabold leading-[1.12] tracking-[-0.035em] text-white">
+                Convertissez tout
+                en <span class="bg-gradient-to-br from-[#ff3b30] to-[#ff8c42] bg-clip-text text-transparent">PDF</span><br>
+                instantanément.
+            </h2>
+
+            <p class="mt-5 text-[0.88rem] leading-[1.75] text-white/[0.38]">
+                URL, HTML, Markdown ou texte brut — notre moteur Gotenberg génère des documents propres et fidèles à votre mise en page.
+            </p>
+
+            {# Stats #}
+            <div class="mt-11 flex flex-col gap-2.5">
+
+                <div class="flex items-center gap-3.5 rounded-xl border border-white/[0.055] bg-white/[0.025] px-4 py-3.5">
+                    <div class="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg border border-[#ff3b30]/20 bg-[#ff3b30]/[0.12]">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,59,48,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                            <polyline points="13 2 13 9 20 9"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[0.78rem] font-semibold text-white/75">Génération instantanée</p>
+                        <p class="text-[0.69rem] text-white/30">PDF prêt en quelques secondes</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3.5 rounded-xl border border-white/[0.055] bg-white/[0.025] px-4 py-3.5">
+                    <div class="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg border border-[#ff6b35]/20 bg-[#ff6b35]/[0.12]">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,107,53,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[0.78rem] font-semibold text-white/75">Données sécurisées</p>
+                        <p class="text-[0.69rem] text-white/30">Vos fichiers ne sont jamais stockés</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3.5 rounded-xl border border-white/[0.055] bg-white/[0.025] px-4 py-3.5">
+                    <div class="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg border border-[#4a9eff]/20 bg-[#4a9eff]/[0.12]">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(74,158,255,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[0.78rem] font-semibold text-white/75">Haute qualité</p>
+                        <p class="text-[0.69rem] text-white/30">Rendu haute fidélité garanti</p>
+                    </div>
+                </div>
+
+            </div>
         </div>
-    {% endif %}
-
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-    <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
-
-    <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" name="_remember_me"> Remember me
-        </label>
     </div>
 
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
-</form>
+    {# ════════════════════════════════════
+       Panneau droit — formulaire
+    ════════════════════════════════════ #}
+    <div class="flex items-center justify-center bg-[#08080c] px-6 py-12">
+        <div class="animate-fade-up w-full max-w-[400px]">
+
+            <h1 class="font-heading text-[1.75rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-white">
+                Content de vous revoir
+            </h1>
+            <p class="mt-2 mb-8 text-[0.85rem] text-white/40">
+                Connectez-vous pour accéder à vos conversions.
+            </p>
+
+            {# Déjà connecté #}
+            {% if app.user %}
+                <div class="mb-5 rounded-xl border border-[#4a9eff]/20 bg-[#4a9eff]/[0.06] px-4 py-3 text-[0.82rem] text-[#4a9eff]">
+                    Connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>.
+                    <a href="{{ logout_path() }}" class="ml-1 font-medium underline opacity-75 hover:opacity-100">Déconnexion</a>
+                </div>
+            {% endif %}
+
+            {# Erreur d'authentification #}
+            {% if error %}
+                <div class="mb-5 rounded-xl border border-[#ff4444]/20 bg-[#ff4444]/[0.07] px-4 py-3 text-[0.8rem] leading-relaxed text-[#ff6b6b]">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            <form method="post">
+                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+                {# ── Email ── #}
+                <div class="mb-3.5 flex flex-col gap-1.5">
+                    <label for="inputEmail" class="text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50">
+                        Adresse e-mail
+                    </label>
+                    <input
+                        type="email"
+                        id="inputEmail"
+                        name="email"
+                        value="{{ last_username }}"
+                        autocomplete="email"
+                        autofocus
+                        required
+                        placeholder="jean@exemple.com"
+                        class="w-full rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-[0.875rem] text-[#f0f0f5] outline-none transition-all placeholder:text-white/20 focus:border-[#ff3b30]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#ff3b30]/[0.07]"
+                    >
+                </div>
+
+                {# ── Mot de passe ── #}
+                <div class="mb-5 flex flex-col gap-1.5">
+                    <div class="flex items-center justify-between">
+                        <label for="inputPassword" class="text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50">
+                            Mot de passe
+                        </label>
+                        <a href="#" class="text-[0.72rem] text-white/35 transition-colors hover:text-white/70">
+                            Mot de passe oublié ?
+                        </a>
+                    </div>
+                    <input
+                        type="password"
+                        id="inputPassword"
+                        name="password"
+                        autocomplete="current-password"
+                        required
+                        placeholder="••••••••"
+                        class="w-full rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-[0.875rem] text-[#f0f0f5] outline-none transition-all placeholder:text-white/20 focus:border-[#ff3b30]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#ff3b30]/[0.07]"
+                    >
+                </div>
+
+                {# ── Se souvenir de moi ── #}
+                <div class="mb-6">
+                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 transition-colors hover:border-white/[0.10] hover:bg-white/[0.04]">
+                        <div class="relative h-[17px] w-[17px] shrink-0 rounded-[5px]">
+                            <input
+                                type="checkbox"
+                                name="_remember_me"
+                                class="peer absolute inset-0 m-0 h-full w-full cursor-pointer opacity-0"
+                            >
+                            <div class="absolute inset-0 rounded-[5px] border border-white/20 transition-all peer-checked:border-transparent peer-checked:bg-gradient-to-br peer-checked:from-[#ff3b30] peer-checked:to-[#ff6b35]"></div>
+                            <svg class="pointer-events-none absolute inset-0 m-auto h-[9px] w-[9px] text-white opacity-0 transition-opacity peer-checked:opacity-100" viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="1 4 3.5 6.5 9 1"/>
+                            </svg>
+                        </div>
+                        <span class="text-[0.82rem] text-white/45">Se souvenir de moi</span>
+                    </label>
+                </div>
+
+                {# ── Bouton submit ── #}
+                <button type="submit"
+                        class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] px-6 py-3.5 text-[0.9rem] font-semibold text-white shadow-lg shadow-[#ff3b30]/25 transition-all hover:shadow-xl hover:shadow-[#ff3b30]/35 active:translate-y-0">
+                    Se connecter
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+
+            </form>
+
+            <p class="mt-6 text-center text-[0.8rem] text-white/30">
+                Pas encore de compte ?&nbsp;<a href="{{ path('app_register') }}" class="font-medium text-white/60 transition-colors hover:text-white">S'inscrire gratuitement</a>
+            </p>
+
+        </div>
+    </div>
+
+</div>
 {% endblock %}
