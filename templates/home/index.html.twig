@@ -35,7 +35,7 @@
 
         {% if app.user %}
             <div class="mt-10 animate-fade-up delay-300">
-                <a href="{{ path('app_pdf_generate') }}"
+                <a href="{{ path('app_tools') }}"
                    class="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] px-8 py-3.5 text-base font-600 text-white shadow-xl shadow-[#ff3b30]/20 transition-all hover:shadow-2xl hover:shadow-[#ff3b30]/30 hover:scale-[1.02]">
                     Générer un PDF
                     <svg class="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -192,7 +192,7 @@
 
                         {# CTA button #}
                         {% if app.user %}
-                            <a href="{{ path('app_pdf_generate') }}"
+                            <a href="{{ path('app_tools') }}"
                                class="block w-full rounded-xl py-3 text-center text-sm font-600 transition-all duration-200
                                {% if is_popular %}
                                    bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] text-white shadow-lg shadow-[#ff3b30]/20 hover:shadow-xl hover:shadow-[#ff3b30]/30

@@ -1,0 +1,202 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ tool.name }} — PDFactory{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-3xl px-6 py-12 lg:py-16">
+
+    {# ── Retour ── #}
+    <a href="{{ path('app_tools') }}"
+       class="mb-8 inline-flex items-center gap-2 text-[0.8rem] text-white/35 transition-colors hover:text-white/70 animate-fade-up">
+        <i class="fa-solid fa-arrow-left text-[0.75rem]"></i>
+        Retour aux outils
+    </a>
+
+    {# ── Flash erreur ── #}
+    {% for message in app.flashes('error') %}
+        <div class="mb-6 flex items-start gap-3 rounded-xl border border-[#ff4444]/20 bg-[#ff4444]/[0.07] px-4 py-3.5 text-[0.82rem] text-[#ff6b6b]">
+            <i class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0"></i>
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% if error is defined and error %}
+        <div class="mb-6 flex items-start gap-3 rounded-xl border border-[#ff4444]/20 bg-[#ff4444]/[0.07] px-4 py-3.5 text-[0.82rem] text-[#ff6b6b]">
+            <i class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0"></i>
+            {{ error }}
+        </div>
+    {% endif %}
+
+    {# ── En-tête de l'outil ── #}
+    <div class="mb-10 flex items-center gap-5 animate-fade-up delay-100">
+        <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl"
+             style="background: {{ tool.color }}20; border: 1px solid {{ tool.color }}35;">
+            <i class="{{ tool.icon }} text-2xl" style="color: {{ tool.color }};"></i>
+        </div>
+        <div>
+            <h1 class="font-heading text-2xl font-extrabold tracking-[-0.03em] text-white md:text-3xl">
+                {{ tool.name }}
+            </h1>
+            <p class="mt-1 text-[0.85rem] text-white/40">{{ tool.description }}</p>
+        </div>
+    </div>
+
+    {# ── Carte formulaire ── #}
+    <div class="animate-fade-up delay-200 rounded-2xl border border-white/[0.07] bg-[#111118] p-8">
+
+        {# Détermination du type d'entrée #}
+        {% set isUrlTool  = 'URL' in tool.name or 'Capture' in tool.name %}
+        {% set isTextTool = 'HTML' in tool.name or 'Markdown' in tool.name %}
+        {% set isFileTool = not isUrlTool and not isTextTool %}
+
+        <form method="post"
+              enctype="{{ isFileTool or isTextTool ? 'multipart/form-data' : 'application/x-www-form-urlencoded' }}"
+              data-turbo="false">
+
+            {% if isUrlTool %}
+                {# ── Formulaire URL ── #}
+                <div class="flex flex-col gap-1.5">
+                    <label for="url"
+                           class="text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50">
+                        Adresse URL
+                    </label>
+                    <div class="relative">
+                        <div class="pointer-events-none absolute inset-y-0 left-4 flex items-center">
+                            <i class="fa-solid fa-link text-[0.8rem] text-white/20"></i>
+                        </div>
+                        <input type="url"
+                               id="url"
+                               name="url"
+                               required
+                               placeholder="https://exemple.com/page"
+                               class="w-full rounded-xl border border-white/[0.08] bg-white/[0.035] py-3 pl-10 pr-4 text-[0.875rem] text-[#f0f0f5] outline-none transition-all placeholder:text-white/20 focus:border-[#ff3b30]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#ff3b30]/[0.07]">
+                    </div>
+                    <p class="text-[0.72rem] text-white/25">
+                        La page sera chargée et rendue via Chromium avant d'être convertie en PDF.
+                    </p>
+                </div>
+
+            {% elseif isTextTool %}
+                {# ── Formulaire fichier texte / HTML / Markdown ── #}
+                <div class="flex flex-col gap-1.5">
+                    <label for="file"
+                           class="text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50">
+                        {% if 'HTML' in tool.name %}Fichier HTML{% else %}Fichier Markdown{% endif %}
+                    </label>
+                    <label for="file"
+                           class="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-white/[0.12] bg-white/[0.02] px-6 py-10 text-center transition-all hover:border-white/[0.22] hover:bg-white/[0.04]">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl"
+                             style="background: {{ tool.color }}15; border: 1px solid {{ tool.color }}25;">
+                            <i class="{{ tool.icon }} text-xl" style="color: {{ tool.color }}; opacity: 0.7;"></i>
+                        </div>
+                        <div>
+                            <p class="text-[0.85rem] font-medium text-white/60">
+                                Glissez votre fichier ici ou <span style="color: {{ tool.color }};">parcourir</span>
+                            </p>
+                            <p class="mt-1 text-[0.72rem] text-white/25">
+                                {% if 'HTML' in tool.name %}.html, .htm{% else %}.md, .markdown{% endif %}
+                                — max. 10 Mo
+                            </p>
+                        </div>
+                        <input type="file"
+                               id="file"
+                               name="file"
+                               required
+                               accept="{{ 'HTML' in tool.name ? '.html,.htm' : '.md,.markdown' }}"
+                               class="sr-only">
+                    </label>
+                    <p id="file-name" class="hidden text-center text-[0.75rem] text-white/40"></p>
+                </div>
+
+            {% else %}
+                {# ── Formulaire upload fichier générique ── #}
+                {% set accept = '' %}
+                {% if 'Word' in tool.name %}{% set accept = '.doc,.docx' %}
+                {% elseif 'Excel' in tool.name %}{% set accept = '.xls,.xlsx' %}
+                {% elseif 'PowerPoint' in tool.name %}{% set accept = '.ppt,.pptx' %}
+                {% elseif 'Texte' in tool.name %}{% set accept = '.txt' %}
+                {% elseif 'ODT' in tool.name %}{% set accept = '.odt' %}
+                {% elseif 'ODS' in tool.name %}{% set accept = '.ods' %}
+                {% elseif 'ODP' in tool.name %}{% set accept = '.odp' %}
+                {% elseif 'RTF' in tool.name %}{% set accept = '.rtf' %}
+                {% elseif 'CSV' in tool.name %}{% set accept = '.csv' %}
+                {% elseif 'Image' in tool.name %}{% set accept = '.png,.jpg,.jpeg' %}
+                {% elseif 'SVG' in tool.name %}{% set accept = '.svg' %}
+                {% elseif 'PDF' in tool.name %}{% set accept = '.pdf' %}
+                {% endif %}
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="file"
+                           class="text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50">
+                        Fichier source
+                    </label>
+                    <label for="file"
+                           class="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-white/[0.12] bg-white/[0.02] px-6 py-10 text-center transition-all hover:border-white/[0.22] hover:bg-white/[0.04]">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl"
+                             style="background: {{ tool.color }}15; border: 1px solid {{ tool.color }}25;">
+                            <i class="{{ tool.icon }} text-xl" style="color: {{ tool.color }}; opacity: 0.7;"></i>
+                        </div>
+                        <div>
+                            <p class="text-[0.85rem] font-medium text-white/60">
+                                Glissez votre fichier ici ou <span style="color: {{ tool.color }};">parcourir</span>
+                            </p>
+                            <p class="mt-1 text-[0.72rem] text-white/25">
+                                {{ accept }} — max. 50 Mo
+                            </p>
+                        </div>
+                        <input type="file"
+                               id="file"
+                               name="file"
+                               required
+                               accept="{{ accept }}"
+                               class="sr-only">
+                    </label>
+                    <p id="file-name" class="hidden text-center text-[0.75rem] text-white/40"></p>
+                </div>
+            {% endif %}
+
+            {# ── Bouton de conversion ── #}
+            <button type="submit"
+                    class="mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-[0.9rem] font-semibold text-white shadow-lg transition-all hover:-translate-y-px hover:shadow-xl active:translate-y-0"
+                    style="background: linear-gradient(135deg, {{ tool.color }}, {{ tool.color }}cc); box-shadow: 0 4px 20px {{ tool.color }}30;">
+                <i class="fa-solid fa-file-arrow-down text-[0.9rem]"></i>
+                Convertir en PDF
+            </button>
+
+        </form>
+    </div>
+
+    {# ── Informations complémentaires ── #}
+    <div class="mt-6 grid grid-cols-3 gap-3 animate-fade-up delay-300">
+        <div class="rounded-xl border border-white/[0.05] bg-[#111118] p-4 text-center">
+            <i class="fa-solid fa-bolt text-[#ffb340] mb-2 block text-lg"></i>
+            <p class="text-[0.72rem] font-semibold text-white/60">Instantané</p>
+            <p class="text-[0.68rem] text-white/25">Résultat en secondes</p>
+        </div>
+        <div class="rounded-xl border border-white/[0.05] bg-[#111118] p-4 text-center">
+            <i class="fa-solid fa-shield-halved text-[#4a9eff] mb-2 block text-lg"></i>
+            <p class="text-[0.72rem] font-semibold text-white/60">Sécurisé</p>
+            <p class="text-[0.68rem] text-white/25">Fichiers non stockés</p>
+        </div>
+        <div class="rounded-xl border border-white/[0.05] bg-[#111118] p-4 text-center">
+            <i class="fa-solid fa-star text-[#34c759] mb-2 block text-lg"></i>
+            <p class="text-[0.72rem] font-semibold text-white/60">Haute qualité</p>
+            <p class="text-[0.68rem] text-white/25">Rendu Gotenberg</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Affiche le nom du fichier sélectionné
+    const fileInput = document.getElementById('file');
+    const fileName  = document.getElementById('file-name');
+    if (fileInput && fileName) {
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileName.textContent = fileInput.files[0].name;
+                fileName.classList.remove('hidden');
+            }
+        });
+    }
+</script>
+{% endblock %}

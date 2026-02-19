@@ -56,9 +56,16 @@ class Plan
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $created_at = null;
 
+    /**
+     * @var Collection<int, Tool>
+     */
+    #[ORM\ManyToMany(targetEntity: Tool::class, mappedBy: 'plan')]
+    private Collection $tools;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->tools = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -226,5 +233,32 @@ class Plan
     {
         // C'est ici qu'on définit la date automatiquement
         $this->created_at = new \DateTimeImmutable();
+    }
+
+    /**
+     * @return Collection<int, Tool>
+     */
+    public function getTools(): Collection
+    {
+        return $this->tools;
+    }
+
+    public function addTool(Tool $tool): static
+    {
+        if (!$this->tools->contains($tool)) {
+            $this->tools->add($tool);
+            $tool->addPlan($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTool(Tool $tool): static
+    {
+        if ($this->tools->removeElement($tool)) {
+            $tool->removePlan($this);
+        }
+
+        return $this;
     }
 }

@@ -1,0 +1,194 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Outils de conversion — PDFactory{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-7xl px-6 py-12 lg:py-16">
+
+    {# ── En-tête ── #}
+    <div class="mb-10 animate-fade-up">
+        <h1 class="font-heading text-3xl font-extrabold tracking-[-0.03em] text-white md:text-4xl">
+            Choisissez votre outil
+        </h1>
+        <p class="mt-3 text-[0.9rem] text-white/40">
+            {{ tools|length }} outils disponibles — sélectionnez un format source pour démarrer votre conversion.
+        </p>
+    </div>
+
+    {# ── Filtres par plan ── #}
+    <div class="mb-8 flex flex-wrap items-center gap-2 animate-fade-up delay-100">
+        <button data-filter="all"
+                class="filter-btn active rounded-full border border-white/10 bg-white/[0.06] px-4 py-1.5 text-[0.78rem] font-semibold text-white transition-all hover:bg-white/[0.1]">
+            Tous
+        </button>
+        <button data-filter="free"
+                class="filter-btn rounded-full border border-white/[0.06] bg-transparent px-4 py-1.5 text-[0.78rem] font-semibold text-white/50 transition-all hover:bg-white/[0.06] hover:text-white">
+            FREE
+        </button>
+        <button data-filter="basic"
+                class="filter-btn rounded-full border border-[#4a9eff]/20 bg-transparent px-4 py-1.5 text-[0.78rem] font-semibold text-[#4a9eff]/60 transition-all hover:bg-[#4a9eff]/[0.08] hover:text-[#4a9eff]">
+            BASIC
+        </button>
+        <button data-filter="premium"
+                class="filter-btn rounded-full border border-[#ffb340]/20 bg-transparent px-4 py-1.5 text-[0.78rem] font-semibold text-[#ffb340]/60 transition-all hover:bg-[#ffb340]/[0.08] hover:text-[#ffb340]">
+            PREMIUM
+        </button>
+    </div>
+
+    {# ── Grille des outils ── #}
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" id="tools-grid">
+
+        {% for tool in tools %}
+            {# Détermination du plan minimum requis (plan le moins cher) #}
+            {% set minPlan = null %}
+            {% for plan in tool.plan %}
+                {% if minPlan is null or plan.price < minPlan.price %}
+                    {% set minPlan = plan %}
+                {% endif %}
+            {% endfor %}
+
+            {# L'utilisateur a-t-il accès à cet outil ? #}
+            {% set hasAccess = false %}
+            {% for plan in tool.plan %}
+                {% if is_granted(plan.role) %}
+                    {% set hasAccess = true %}
+                {% endif %}
+            {% endfor %}
+
+            {# Slug du plan pour le filtre JS #}
+            {% set planSlug = minPlan ? minPlan.name|lower : 'free' %}
+
+            <div class="tool-card animate-fade-up delay-{{ (loop.index0 % 6) * 100 + 100 }}"
+                 data-plan="{{ planSlug }}">
+
+                {% if hasAccess %}
+                    <a href="{{ path('app_tool_convert', {id: tool.id}) }}"
+                       class="group flex h-full flex-col rounded-2xl border border-white/[0.07] bg-[#111118] transition-all duration-300 hover:-translate-y-1 hover:border-white/[0.14] hover:shadow-xl"
+                       style="hover:shadow-color: {{ tool.color }}20">
+
+                        {# En-tête coloré #}
+                        <div class="flex items-center gap-4 rounded-t-2xl p-5"
+                             style="background: linear-gradient(135deg, {{ tool.color }}18, {{ tool.color }}08);">
+                            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                                 style="background: {{ tool.color }}20; border: 1px solid {{ tool.color }}35;">
+                                <i class="{{ tool.icon }} text-lg" style="color: {{ tool.color }};"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="font-heading text-[0.95rem] font-bold leading-tight text-white">
+                                    {{ tool.name }}
+                                </h3>
+                                {# Badge plan #}
+                                {% if planSlug == 'free' %}
+                                    <span class="mt-1 inline-block rounded-full bg-white/[0.07] px-2 py-[2px] text-[0.62rem] font-bold uppercase tracking-wider text-white/40">
+                                        FREE
+                                    </span>
+                                {% elseif planSlug == 'basic' %}
+                                    <span class="mt-1 inline-block rounded-full bg-[#4a9eff]/10 px-2 py-[2px] text-[0.62rem] font-bold uppercase tracking-wider text-[#4a9eff]">
+                                        BASIC
+                                    </span>
+                                {% else %}
+                                    <span class="mt-1 inline-block rounded-full bg-[#ffb340]/10 px-2 py-[2px] text-[0.62rem] font-bold uppercase tracking-wider text-[#ffb340]">
+                                        PREMIUM
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {# Corps #}
+                        <div class="flex flex-1 flex-col justify-between px-5 pb-5 pt-4">
+                            <p class="text-[0.8rem] leading-relaxed text-white/45">
+                                {{ tool.description }}
+                            </p>
+                            <div class="mt-4 flex items-center gap-1.5 text-[0.78rem] font-semibold transition-all"
+                                 style="color: {{ tool.color }}; opacity: 0.7;">
+                                <span class="group-hover:opacity-100" style="opacity: 0.7;">Convertir</span>
+                                <i class="fa-solid fa-arrow-right text-[0.7rem] transition-transform group-hover:translate-x-0.5" style="opacity: 0.7;"></i>
+                            </div>
+                        </div>
+
+                    </a>
+
+                {% else %}
+                    {# Carte verrouillée #}
+                    <div class="flex h-full flex-col rounded-2xl border border-white/[0.05] bg-[#111118] opacity-60">
+
+                        <div class="flex items-center gap-4 rounded-t-2xl p-5"
+                             style="background: linear-gradient(135deg, {{ tool.color }}0a, {{ tool.color }}04);">
+                            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                                 style="background: {{ tool.color }}10; border: 1px solid {{ tool.color }}20;">
+                                <i class="{{ tool.icon }} text-lg" style="color: {{ tool.color }}; opacity: 0.4;"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="font-heading text-[0.95rem] font-bold leading-tight text-white/50">
+                                    {{ tool.name }}
+                                </h3>
+                                {# Badge plan requis #}
+                                {% if planSlug == 'basic' %}
+                                    <span class="mt-1 inline-flex items-center gap-1 rounded-full bg-[#4a9eff]/10 px-2 py-[2px] text-[0.62rem] font-bold uppercase tracking-wider text-[#4a9eff]/70">
+                                        <i class="fa-solid fa-lock text-[0.55rem]"></i> BASIC requis
+                                    </span>
+                                {% else %}
+                                    <span class="mt-1 inline-flex items-center gap-1 rounded-full bg-[#ffb340]/10 px-2 py-[2px] text-[0.62rem] font-bold uppercase tracking-wider text-[#ffb340]/70">
+                                        <i class="fa-solid fa-lock text-[0.55rem]"></i> PREMIUM requis
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="flex flex-1 flex-col justify-between px-5 pb-5 pt-4">
+                            <p class="text-[0.8rem] leading-relaxed text-white/25">
+                                {{ tool.description }}
+                            </p>
+                            <a href="{{ path('app_register') }}"
+                               class="mt-4 inline-flex items-center gap-1.5 text-[0.78rem] font-semibold text-white/30 transition-colors hover:text-white/60">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[0.7rem]"></i>
+                                Mettre à niveau
+                            </a>
+                        </div>
+
+                    </div>
+                {% endif %}
+
+            </div>
+        {% endfor %}
+
+    </div>
+
+    {# Message si aucun outil affiché après filtre #}
+    <div id="no-results" class="hidden py-20 text-center text-white/30">
+        <i class="fa-solid fa-filter text-4xl mb-4 block opacity-20"></i>
+        Aucun outil pour ce filtre.
+    </div>
+
+</div>
+
+<script>
+    const buttons = document.querySelectorAll('.filter-btn');
+    const cards   = document.querySelectorAll('.tool-card');
+    const noRes   = document.getElementById('no-results');
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.filter;
+
+            // Styles boutons
+            buttons.forEach(b => {
+                b.classList.remove('active', 'bg-white/[0.06]', 'text-white');
+                b.classList.add('text-white/50');
+            });
+            btn.classList.add('active', 'bg-white/[0.06]', 'text-white');
+            btn.classList.remove('text-white/50');
+
+            // Filtre cartes
+            let visible = 0;
+            cards.forEach(card => {
+                const show = filter === 'all' || card.dataset.plan === filter;
+                card.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+
+            noRes.classList.toggle('hidden', visible > 0);
+        });
+    });
+</script>
+{% endblock %}
