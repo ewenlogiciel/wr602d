@@ -44,12 +44,13 @@
     <div class="animate-fade-up delay-200 rounded-2xl border border-white/[0.07] bg-[#111118] p-8">
 
         {# Détermination du type d'entrée #}
-        {% set isUrlTool  = 'URL' in tool.name or 'Capture' in tool.name %}
-        {% set isTextTool = 'HTML' in tool.name or 'Markdown' in tool.name %}
-        {% set isFileTool = not isUrlTool and not isTextTool %}
+        {% set isUrlTool   = 'URL' in tool.name or 'Capture' in tool.name %}
+        {% set isTextTool  = 'HTML' in tool.name or 'Markdown' in tool.name %}
+        {% set isMergeTool = 'Fusionner' in tool.name %}
+        {% set isFileTool  = not isUrlTool and not isTextTool and not isMergeTool %}
 
         <form method="post"
-              enctype="{{ isFileTool or isTextTool ? 'multipart/form-data' : 'application/x-www-form-urlencoded' }}"
+              enctype="{{ isFileTool or isTextTool or isMergeTool ? 'multipart/form-data' : 'application/x-www-form-urlencoded' }}"
               data-turbo="false">
 
             {% if isUrlTool %}
@@ -105,6 +106,38 @@
                                class="sr-only">
                     </label>
                     <p id="file-name" class="hidden text-center text-[0.75rem] text-white/40"></p>
+                </div>
+
+            {% elseif isMergeTool %}
+                {# ── Formulaire fusion PDF (multi-fichiers) ── #}
+                <div class="flex flex-col gap-1.5">
+                    <label for="files"
+                           class="text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50">
+                        Fichiers PDF à fusionner
+                    </label>
+                    <label for="files"
+                           class="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-white/[0.12] bg-white/[0.02] px-6 py-10 text-center transition-all hover:border-white/[0.22] hover:bg-white/[0.04]">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl"
+                             style="background: {{ tool.color }}15; border: 1px solid {{ tool.color }}25;">
+                            <i class="{{ tool.icon }} text-xl" style="color: {{ tool.color }}; opacity: 0.7;"></i>
+                        </div>
+                        <div>
+                            <p class="text-[0.85rem] font-medium text-white/60">
+                                Glissez vos fichiers ici ou <span style="color: {{ tool.color }};">parcourir</span>
+                            </p>
+                            <p class="mt-1 text-[0.72rem] text-white/25">
+                                .pdf uniquement — 2 fichiers minimum — max. 50 Mo chacun
+                            </p>
+                        </div>
+                        <input type="file"
+                               id="files"
+                               name="files[]"
+                               required
+                               accept=".pdf"
+                               multiple
+                               class="sr-only">
+                    </label>
+                    <p id="files-count" class="hidden text-center text-[0.75rem] text-white/40"></p>
                 </div>
 
             {% else %}
@@ -187,7 +220,7 @@
 </div>
 
 <script>
-    // Affiche le nom du fichier sélectionné
+    // Affiche le nom du fichier sélectionné (outil single-file)
     const fileInput = document.getElementById('file');
     const fileName  = document.getElementById('file-name');
     if (fileInput && fileName) {
@@ -195,6 +228,19 @@
             if (fileInput.files.length > 0) {
                 fileName.textContent = fileInput.files[0].name;
                 fileName.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Affiche le nombre de fichiers sélectionnés (outil fusion)
+    const filesInput = document.getElementById('files');
+    const filesCount = document.getElementById('files-count');
+    if (filesInput && filesCount) {
+        filesInput.addEventListener('change', () => {
+            const n = filesInput.files.length;
+            if (n > 0) {
+                filesCount.textContent = n + ' fichier' + (n > 1 ? 's' : '') + ' sélectionné' + (n > 1 ? 's' : '');
+                filesCount.classList.remove('hidden');
             }
         });
     }

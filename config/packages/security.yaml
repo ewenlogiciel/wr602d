@@ -13,7 +13,8 @@ security:
                 property: email
 
     role_hierarchy:
-        ROLE_PREMIUM:     ROLE_USER
+        ROLE_BASIC:       ROLE_USER
+        ROLE_PREMIUM:     ROLE_BASIC
         ROLE_ADMIN:       ROLE_PREMIUM
         ROLE_SUPER_ADMIN: [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
 
