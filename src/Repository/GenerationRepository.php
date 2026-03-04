@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Generation;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,19 @@ class GenerationRepository extends ServiceEntityRepository
         parent::__construct($registry, Generation::class);
     }
 
-//    /**
-//     * @return Generation[] Returns an array of Generation objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('g')
-//            ->andWhere('g.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('g.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Generation
-//    {
-//        return $this->createQueryBuilder('g')
-//            ->andWhere('g.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * @return Generation[]
+     */
+    public function findByUserOrderedByDate(User $user): array
+    {
+        return $this->createQueryBuilder('g')
+            ->leftJoin('g.tool', 't')
+            ->addSelect('t')
+            ->andWhere('g.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('g.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

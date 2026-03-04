@@ -6,6 +6,7 @@ use App\Repository\GenerationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Tool;
 
 #[ORM\Entity(repositoryClass: GenerationRepository::class)]
 class Generation
@@ -24,6 +25,13 @@ class Generation
     #[ORM\ManyToOne(inversedBy: 'generations')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Tool $tool = null;
+
+    #[ORM\Column(length: 512, nullable: true)]
+    private ?string $source = null;
 
     /**
      * @var Collection<int, UserContact>
@@ -97,6 +105,30 @@ class Generation
     public function removeUserContact(UserContact $userContact): static
     {
         $this->userContacts->removeElement($userContact);
+
+        return $this;
+    }
+
+    public function getTool(): ?Tool
+    {
+        return $this->tool;
+    }
+
+    public function setTool(?Tool $tool): static
+    {
+        $this->tool = $tool;
+
+        return $this;
+    }
+
+    public function getSource(): ?string
+    {
+        return $this->source;
+    }
+
+    public function setSource(?string $source): static
+    {
+        $this->source = $source;
 
         return $this;
     }
