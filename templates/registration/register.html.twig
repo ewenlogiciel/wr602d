@@ -182,20 +182,96 @@
                 </div>
 
                 {# ── Forfait ── #}
-                <div class="mb-3.5 flex flex-col gap-1.5">
-                    {{ form_label(registrationForm.plan, 'Forfait', {
-                        'label_attr': {'class': 'text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50'}
-                    }) }}
-                    <div class="relative">
-                        {{ form_widget(registrationForm.plan, {
-                            'attr': {'class': 'w-full appearance-none rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-3 pr-10 text-[0.875rem] text-[#f0f0f5] outline-none transition-all focus:border-[#ff3b30]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#ff3b30]/[0.07] cursor-pointer [&_option]:bg-[#1a1a24]'}
-                        }) }}
-                        <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="6 9 12 15 18 9"/>
-                            </svg>
-                        </div>
+                <div class="mb-5 flex flex-col gap-2">
+                    <span class="text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50">Forfait</span>
+
+                    {# Plan card picker — each label wraps a sr-only radio + card content #}
+                    {% set planChoices = registrationForm.plan.vars.choices %}
+                    <div class="grid grid-cols-3 gap-2" id="plan-cards">
+                        {% for child in registrationForm.plan %}
+                            {% set choiceView = planChoices[child.vars.value] ?? null %}
+                            {% if choiceView is not null and choiceView.data is not null %}
+                                {% set plan  = choiceView.data %}
+                                {% set planUp = plan.name|upper %}
+                                {% if planUp == 'PREMIUM' %}
+                                    {% set ac   = '#ffb340' %}
+                                    {% set acBg = 'rgba(255,179,64,0.09)' %}
+                                    {% set acBd = 'rgba(255,179,64,0.20)' %}
+                                {% elseif planUp == 'BASIC' %}
+                                    {% set ac   = '#4a9eff' %}
+                                    {% set acBg = 'rgba(74,158,255,0.09)' %}
+                                    {% set acBd = 'rgba(74,158,255,0.20)' %}
+                                {% else %}
+                                    {% set ac   = '#8888a0' %}
+                                    {% set acBg = 'rgba(136,136,160,0.07)' %}
+                                    {% set acBd = 'rgba(136,136,160,0.16)' %}
+                                {% endif %}
+
+                                <label for="{{ child.vars.id }}"
+                                       class="plan-card relative flex flex-col cursor-pointer rounded-xl border border-white/[0.07] bg-[#111118] p-3 transition-all duration-200 hover:-translate-y-0.5 focus-within:outline-none select-none"
+                                       data-color="{{ ac }}">
+
+                                    {# Hidden radio input (native selection behaviour) #}
+                                    {{ form_widget(child, {'attr': {'class': 'sr-only'}}) }}
+
+                                    {# "Populaire" badge — BASIC only #}
+                                    {% if planUp == 'BASIC' %}
+                                        <div class="pointer-events-none absolute -top-2.5 inset-x-0 flex justify-center">
+                                            <span class="whitespace-nowrap rounded-full bg-[#4a9eff] px-2 py-[1.5px] text-[0.56rem] font-bold uppercase tracking-[0.07em] text-white shadow-sm shadow-[#4a9eff]/40">
+                                                Populaire
+                                            </span>
+                                        </div>
+                                    {% endif %}
+
+                                    {# Checkmark dot (opacity driven by JS on radio change) #}
+                                    <div class="check-dot pointer-events-none absolute right-2 top-2 flex h-[14px] w-[14px] items-center justify-center rounded-full opacity-0 transition-all duration-150">
+                                        <svg width="7" height="6" viewBox="0 0 7 6" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="0.75 3 2.5 4.75 6.25 0.75"/>
+                                        </svg>
+                                    </div>
+
+                                    {# Plan icon #}
+                                    <div class="mb-2 flex h-7 w-7 items-center justify-center rounded-lg"
+                                         style="background:{{ acBg }};border:1px solid {{ acBd }};">
+                                        {% if planUp == 'FREE' %}
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="{{ ac }}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                                            </svg>
+                                        {% elseif planUp == 'BASIC' %}
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="{{ ac }}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+                                            </svg>
+                                        {% else %}
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="{{ ac }}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.841m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+                                            </svg>
+                                        {% endif %}
+                                    </div>
+
+                                    {# Name #}
+                                    <p class="mb-1 font-heading text-[0.78rem] font-extrabold tracking-tight text-white">{{ plan.name }}</p>
+
+                                    {# Price #}
+                                    <div class="mb-1.5 leading-none">
+                                        {% if plan.price == 0 %}
+                                            <span class="font-heading text-[0.92rem] font-extrabold text-white">Gratuit</span>
+                                        {% else %}
+                                            <span class="font-heading text-[0.92rem] font-extrabold text-white">{{ plan.price|number_format(0, ',', ' ') }}€</span>
+                                            <span class="text-[0.58rem] text-white/30">/mois</span>
+                                        {% endif %}
+                                    </div>
+
+                                    {# Usage limit #}
+                                    <p class="text-[0.63rem] text-white/30">
+                                        <span class="font-semibold" style="color:{{ ac }};">{{ plan.usageLimit }}</span> générations./j
+                                    </p>
+
+                                </label>
+                            {% endif %}
+                        {% endfor %}
                     </div>
+
+                    {# Validation errors #}
                     <div class="text-[0.72rem] text-[#ff5555] [&_ul]:list-none [&_ul]:p-0 [&_li]:before:mr-1 [&_li]:before:opacity-60 [&_li]:before:content-['↳']">
                         {{ form_errors(registrationForm.plan) }}
                     </div>
@@ -246,4 +322,37 @@
     </div>
 
 </div>
+
+<script>
+(function () {
+    const cards = document.querySelectorAll('#plan-cards .plan-card');
+
+    function refresh() {
+        cards.forEach(function (card) {
+            const radio = card.querySelector('input[type="radio"]');
+            const color = card.dataset.color;
+            const dot   = card.querySelector('.check-dot');
+            const on    = radio && radio.checked;
+            card.style.borderColor = on ? color + '55' : '';
+            card.style.boxShadow   = on ? '0 0 0 1px ' + color + '22, 0 4px 20px ' + color + '18' : '';
+            if (dot) { dot.style.opacity = on ? '1' : '0'; dot.style.background = on ? color : ''; }
+        });
+    }
+
+    cards.forEach(function (card) {
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) radio.addEventListener('change', refresh);
+    });
+
+    // Auto-select first plan if none is pre-checked
+    const anyChecked = Array.from(cards).some(function (c) {
+        const r = c.querySelector('input[type="radio"]'); return r && r.checked;
+    });
+    if (!anyChecked && cards.length) {
+        const first = cards[0].querySelector('input[type="radio"]');
+        if (first) first.checked = true;
+    }
+    refresh();
+})();
+</script>
 {% endblock %}

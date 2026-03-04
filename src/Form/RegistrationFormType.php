@@ -42,9 +42,9 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('plan', EntityType::class, [
                 'class' => Plan::class,
-                'choice_label' => 'name', // Le nom du champ du Plan à afficher dans la liste (ex: 'name' ou 'title')
+                'choice_label' => 'name',
                 'label' => 'Choisissez votre forfait',
-                'placeholder' => 'Sélectionnez un plan',
+                'expanded' => true,
             ])
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,

@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}E-mail envoyé — PDFactory{% endblock %}
+
+{% block body %}
+<div class="flex min-h-[calc(100vh-64px)] items-center justify-center px-6 py-16">
+    <div class="animate-fade-up w-full max-w-md text-center">
+
+        {# Icône #}
+        <div class="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl border border-[#4a9eff]/20 bg-[#4a9eff]/[0.08]">
+            <i class="fa-solid fa-envelope-circle-check text-3xl text-[#4a9eff]"></i>
+        </div>
+
+        <h1 class="font-heading text-2xl font-extrabold tracking-[-0.03em] text-white md:text-3xl">
+            Vérifiez votre boîte mail
+        </h1>
+
+        <p class="mt-4 text-[0.9rem] leading-relaxed text-white/45">
+            Si un compte est associé à cette adresse e-mail, vous allez recevoir un lien de réinitialisation
+            {% if resetToken is defined %}
+                valable <span class="font-semibold text-white/70">{{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}</span>.
+            {% else %}
+                dans les prochaines minutes.
+            {% endif %}
+        </p>
+
+        {# Encart info #}
+        <div class="mt-8 rounded-xl border border-white/[0.07] bg-[#111118] p-5 text-left">
+            <div class="flex flex-col gap-3">
+                <div class="flex items-start gap-3">
+                    <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#ffb340]/15">
+                        <i class="fa-solid fa-triangle-exclamation text-[0.6rem] text-[#ffb340]"></i>
+                    </div>
+                    <p class="text-[0.8rem] leading-relaxed text-white/50">
+                        Si vous ne recevez pas d'e-mail, vérifiez votre dossier <span class="font-medium text-white/70">spam ou courrier indésirable</span>.
+                    </p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#4a9eff]/15">
+                        <i class="fa-solid fa-shield-halved text-[0.6rem] text-[#4a9eff]"></i>
+                    </div>
+                    <p class="text-[0.8rem] leading-relaxed text-white/50">
+                        Pour des raisons de sécurité, nous ne confirmons pas si l'adresse e-mail est associée à un compte.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 flex flex-col items-center gap-3">
+            <a href="{{ path('app_forgot_password_request') }}"
+               class="text-[0.82rem] font-medium text-white/45 transition-colors hover:text-white/80">
+                <i class="fa-solid fa-rotate-left mr-1 text-[0.75rem]"></i>
+                Réessayer avec une autre adresse
+            </a>
+            <a href="{{ path('app_login') }}"
+               class="text-[0.8rem] text-white/25 transition-colors hover:text-white/50">
+                Retour à la connexion
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

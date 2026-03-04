@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Tool;
 use App\Repository\ToolRepository;
+use App\Security\ToolVoter;
 use App\Service\PdfGeneratorService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,16 +29,7 @@ class PdfController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function convert(Tool $tool, Request $request, PdfGeneratorService $pdfGenerator): Response
     {
-        // Vérification d'accès : l'utilisateur doit avoir le rôle d'au moins un plan du tool
-        $hasAccess = false;
-        foreach ($tool->getPlan() as $plan) {
-            if ($this->isGranted($plan->getRole())) {
-                $hasAccess = true;
-                break;
-            }
-        }
-
-        if (!$hasAccess) {
+        if (!$this->isGranted(ToolVoter::ACCESS, $tool)) {
             $this->addFlash('error', 'Votre plan actuel ne donne pas accès à cet outil.');
             return $this->redirectToRoute('app_tools');
         }
