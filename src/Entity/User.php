@@ -66,6 +66,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Generation::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $generations;
 
+    #[ORM\Column]
+    private bool $isVerified = false;
+
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Plan $plan = null;
@@ -290,6 +293,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $generation->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
 
         return $this;
     }

@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vérifiez votre e-mail — PDFactory{% endblock %}
+
+{% block body %}
+<div class="flex min-h-[calc(100vh-64px)] items-center justify-center px-6 py-16">
+    <div class="animate-fade-up w-full max-w-md text-center">
+
+        {# Icône #}
+        <div class="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl border border-[#4a9eff]/20 bg-[#4a9eff]/[0.08]">
+            <i class="fa-solid fa-envelope text-3xl text-[#4a9eff]"></i>
+        </div>
+
+        <h1 class="font-heading text-2xl font-extrabold tracking-[-0.03em] text-white md:text-3xl">
+            Vérifiez votre boîte mail
+        </h1>
+
+        <p class="mt-4 text-[0.9rem] leading-relaxed text-white/45">
+            Un e-mail de confirmation a été envoyé à
+            {% if email is defined and email %}
+                <span class="font-semibold text-white/70">{{ email }}</span>.
+            {% else %}
+                votre adresse e-mail.
+            {% endif %}
+            <br>Cliquez sur le lien dans le mail pour activer votre compte.
+        </p>
+
+        {# Encart info #}
+        <div class="mt-8 rounded-xl border border-white/[0.07] bg-[#111118] p-5 text-left">
+            <div class="flex flex-col gap-3">
+                <div class="flex items-start gap-3">
+                    <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#4a9eff]/15">
+                        <i class="fa-solid fa-clock text-[0.6rem] text-[#4a9eff]"></i>
+                    </div>
+                    <p class="text-[0.8rem] leading-relaxed text-white/50">
+                        Le lien de confirmation est valable <span class="text-white/70 font-medium">1 heure</span>. Passé ce délai, vous devrez vous réinscrire.
+                    </p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#ffb340]/15">
+                        <i class="fa-solid fa-triangle-exclamation text-[0.6rem] text-[#ffb340]"></i>
+                    </div>
+                    <p class="text-[0.8rem] leading-relaxed text-white/50">
+                        Si vous ne voyez pas l'e-mail, pensez à vérifier votre dossier <span class="text-white/70 font-medium">spam ou courrier indésirable</span>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <p class="mt-8 text-[0.8rem] text-white/25">
+            Mauvaise adresse ?
+            <a href="{{ path('app_register') }}" class="font-medium text-white/50 transition-colors hover:text-white">
+                S'inscrire à nouveau
+            </a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}
