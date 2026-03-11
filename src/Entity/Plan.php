@@ -62,6 +62,9 @@ class Plan
     #[ORM\ManyToMany(targetEntity: Tool::class, mappedBy: 'plan')]
     private Collection $tools;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $stripePriceId = null;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -258,6 +261,18 @@ class Plan
         if ($this->tools->removeElement($tool)) {
             $tool->removePlan($this);
         }
+
+        return $this;
+    }
+
+    public function getStripePriceId(): ?string
+    {
+        return $this->stripePriceId;
+    }
+
+    public function setStripePriceId(?string $stripePriceId): static
+    {
+        $this->stripePriceId = $stripePriceId;
 
         return $this;
     }
