@@ -73,6 +73,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?Plan $plan = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $stripeCustomerId = null;
+
     public function __construct()
     {
         $this->userContacts = new ArrayCollection();
@@ -317,6 +320,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlan(?Plan $plan): static
     {
         $this->plan = $plan;
+
+        return $this;
+    }
+
+    public function getStripeCustomerId(): ?string
+    {
+        return $this->stripeCustomerId;
+    }
+
+    public function setStripeCustomerId(?string $stripeCustomerId): static
+    {
+        $this->stripeCustomerId = $stripeCustomerId;
 
         return $this;
     }

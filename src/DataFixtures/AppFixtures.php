@@ -31,6 +31,7 @@ class AppFixtures extends Fixture
         $planBasic->setUsageLimit(20);
         $planBasic->setRole("ROLE_BASIC");
         $planBasic->setActive(true);
+        $planBasic->setStripePriceId("price_1T9odFPeBcEMXzrAUCgKrvYP");
         $manager->persist($planBasic);
 
         $planPremium = new Plan();
@@ -40,6 +41,7 @@ class AppFixtures extends Fixture
         $planPremium->setUsageLimit(200);
         $planPremium->setRole("ROLE_PREMIUM");
         $planPremium->setActive(true);
+        $planPremium->setStripePriceId("price_1T9og8PeBcEMXzrA1BlvwJtf");
         $manager->persist($planPremium);
 
         // ══════════════════════════════════════════

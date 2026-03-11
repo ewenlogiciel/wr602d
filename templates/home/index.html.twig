@@ -185,30 +185,24 @@
                         </ul>
 
                         {# CTA button #}
+                        {% set btn_class %}block w-full rounded-xl py-3 text-center text-sm font-600 transition-all duration-200 {% if is_popular %}bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] text-white shadow-lg shadow-[#ff3b30]/20 hover:shadow-xl hover:shadow-[#ff3b30]/30{% elseif is_premium %}bg-[#4a9eff] text-white shadow-lg shadow-[#4a9eff]/20 hover:shadow-xl hover:shadow-[#4a9eff]/30{% else %}border border-border-hover bg-surface-light text-white hover:bg-[#22222e]{% endif %}{% endset %}
+
                         {% if app.user %}
-                            <a href="{{ path('app_tools') }}"
-                               class="block w-full rounded-xl py-3 text-center text-sm font-600 transition-all duration-200
-                               {% if is_popular %}
-                                   bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] text-white shadow-lg shadow-[#ff3b30]/20 hover:shadow-xl hover:shadow-[#ff3b30]/30
-                               {% elseif is_premium %}
-                                   bg-[#4a9eff] text-white shadow-lg shadow-[#4a9eff]/20 hover:shadow-xl hover:shadow-[#4a9eff]/30
-                               {% else %}
-                                   border border-border-hover bg-surface-light text-white hover:bg-[#22222e]
-                               {% endif %}
-                               ">
-                                Commencer
-                            </a>
+                            {% if app.user.plan and app.user.plan.id == plan.id %}
+                                <span class="{{ btn_class }} opacity-50 cursor-default">
+                                    Plan actuel
+                                </span>
+                            {% elseif plan.price == 0 %}
+                                <a href="{{ path('app_tools') }}" class="{{ btn_class }}">
+                                    Commencer
+                                </a>
+                            {% else %}
+                                <a href="{{ path('app_payment_checkout', { id: plan.id }) }}" class="{{ btn_class }}">
+                                    Choisir ce plan
+                                </a>
+                            {% endif %}
                         {% else %}
-                            <a href="{{ path('app_register') }}"
-                               class="block w-full rounded-xl py-3 text-center text-sm font-600 transition-all duration-200
-                               {% if is_popular %}
-                                   bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] text-white shadow-lg shadow-[#ff3b30]/20 hover:shadow-xl hover:shadow-[#ff3b30]/30
-                               {% elseif is_premium %}
-                                   bg-[#4a9eff] text-white shadow-lg shadow-[#4a9eff]/20 hover:shadow-xl hover:shadow-[#4a9eff]/30
-                               {% else %}
-                                   border border-border-hover bg-surface-light text-white hover:bg-[#22222e]
-                               {% endif %}
-                               ">
+                            <a href="{{ path('app_register') }}" class="{{ btn_class }}">
                                 {% if plan.price == 0 %}
                                     Démarrer gratuitement
                                 {% else %}
