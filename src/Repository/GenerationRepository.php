@@ -17,6 +17,20 @@ class GenerationRepository extends ServiceEntityRepository
         parent::__construct($registry, Generation::class);
     }
 
+    public function countByUserOnDate(User $user, \DateTimeImmutable $startOfDay, \DateTimeImmutable $endOfDay): int
+    {
+        return $this->createQueryBuilder('g')
+            ->select('COUNT(g.id)')
+            ->where('g.user = :user')
+            ->andWhere('g.createdAt BETWEEN :startOfDay AND :endOfDay')
+            ->setParameter('user', $user)
+            ->setParameter('startOfDay', $startOfDay)
+            ->setParameter('endOfDay', $endOfDay)
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
+
     /**
      * @return Generation[]
      */
