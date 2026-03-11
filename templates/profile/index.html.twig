@@ -1,0 +1,181 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil — PDFactory{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-3xl px-6 py-12 lg:py-16">
+
+    {# ── Flash messages ── #}
+    {% for msg in app.flashes('profile_success') %}
+        <div class="mb-5 animate-fade-up flex items-start gap-3 rounded-xl border border-[#34c759]/20 bg-[#34c759]/[0.07] px-4 py-3.5 text-[0.82rem] text-[#34c759]">
+            <i class="fa-solid fa-check mt-0.5 shrink-0"></i> {{ msg }}
+        </div>
+    {% endfor %}
+    {% for msg in app.flashes('password_success') %}
+        <div class="mb-5 animate-fade-up flex items-start gap-3 rounded-xl border border-[#34c759]/20 bg-[#34c759]/[0.07] px-4 py-3.5 text-[0.82rem] text-[#34c759]">
+            <i class="fa-solid fa-check mt-0.5 shrink-0"></i> {{ msg }}
+        </div>
+    {% endfor %}
+    {% for msg in app.flashes('password_error') %}
+        <div class="mb-5 animate-fade-up flex items-start gap-3 rounded-xl border border-[#ff4444]/20 bg-[#ff4444]/[0.07] px-4 py-3.5 text-[0.82rem] text-[#ff6b6b]">
+            <i class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0"></i> {{ msg }}
+        </div>
+    {% endfor %}
+
+    {# ── Carte identité ── #}
+    {% set planName  = app.user.plan ? app.user.plan.name|lower : 'free' %}
+    {% set planColor = {'free': '#6b7280', 'basic': '#4a9eff', 'premium': '#a78bfa'}[planName] ?? '#6b7280' %}
+    {% set avatarColor = app.user.favoriteColor ?? '#ff3b30' %}
+
+    <div class="mb-6 animate-fade-up rounded-2xl border border-white/[0.07] bg-[#111118] p-6">
+        <div class="flex items-center gap-5">
+
+            {# Avatar #}
+            <div class="h-[4.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-2xl flex items-center justify-center text-2xl font-extrabold"
+                 style="background: {{ avatarColor }}20; border: 1px solid {{ avatarColor }}35;">
+                {% if app.user.photo %}
+                    <img src="{{ app.user.photo }}" alt="Photo" class="h-full w-full object-cover">
+                {% else %}
+                    <span style="color: {{ avatarColor }};">{{ app.user.firstname|first|upper }}</span>
+                {% endif %}
+            </div>
+
+            {# Infos #}
+            <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                    <h1 class="font-heading text-xl font-extrabold tracking-[-0.03em] text-white">
+                        {{ app.user.firstname }} {{ app.user.lastname }}
+                    </h1>
+                    <span class="rounded-md px-2.5 py-0.5 text-[0.68rem] font-bold uppercase tracking-wide"
+                          style="background: {{ planColor }}18; color: {{ planColor }}; border: 1px solid {{ planColor }}30;">
+                        {{ planName|capitalize }}
+                    </span>
+                </div>
+                <p class="mt-0.5 text-[0.82rem] text-white/40">{{ app.user.email }}</p>
+                <p class="mt-1.5 text-[0.72rem] text-white/25">
+                    <i class="fa-solid fa-file-pdf mr-1.5 opacity-60"></i>
+                    {{ app.user.generations|length }} génération{{ app.user.generations|length != 1 ? 's' : '' }}
+                    &nbsp;·&nbsp;
+                    <i class="fa-solid fa-{{ app.user.isVerified ? 'circle-check text-[#34c759]' : 'circle-xmark text-[#ff6b6b]' }} mr-1 opacity-80"></i>
+                    Compte {{ app.user.isVerified ? 'vérifié' : 'non vérifié' }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {# ── Macro pour les inputs ── #}
+    {% macro input_class() %}w-full rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-2.5 text-[0.875rem] text-[#f0f0f5] outline-none transition-all placeholder:text-white/20 focus:border-[#ff3b30]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#ff3b30]/[0.07]{% endmacro %}
+    {% macro label_class() %}mb-1.5 block text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50{% endmacro %}
+
+    {# ── Formulaire informations ── #}
+    <div class="mb-6 animate-fade-up delay-100 rounded-2xl border border-white/[0.07] bg-[#111118] p-6">
+
+        <div class="mb-6 flex items-center gap-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#ff3b30]/20 bg-[#ff3b30]/10">
+                <i class="fa-solid fa-user text-sm text-[#ff3b30]"></i>
+            </div>
+            <h2 class="font-heading text-lg font-bold text-white">Mes informations</h2>
+        </div>
+
+        {{ form_start(profileForm, {'attr': {'class': 'flex flex-col gap-5', 'novalidate': 'novalidate'}}) }}
+
+            {# Prénom + Nom #}
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                    {{ form_label(profileForm.firstname, null, {'label_attr': {'class': _self.label_class()}}) }}
+                    {{ form_widget(profileForm.firstname, {'attr': {'class': _self.input_class()}}) }}
+                    {% for error in profileForm.firstname.vars.errors %}
+                        <p class="mt-1 text-[0.72rem] text-[#ff6b6b]">{{ error.message }}</p>
+                    {% endfor %}
+                </div>
+                <div>
+                    {{ form_label(profileForm.lastname, null, {'label_attr': {'class': _self.label_class()}}) }}
+                    {{ form_widget(profileForm.lastname, {'attr': {'class': _self.input_class()}}) }}
+                    {% for error in profileForm.lastname.vars.errors %}
+                        <p class="mt-1 text-[0.72rem] text-[#ff6b6b]">{{ error.message }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Date de naissance + Téléphone #}
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                    {{ form_label(profileForm.dob, null, {'label_attr': {'class': _self.label_class()}}) }}
+                    {{ form_widget(profileForm.dob, {'attr': {'class': _self.input_class()}}) }}
+                    {% for error in profileForm.dob.vars.errors %}
+                        <p class="mt-1 text-[0.72rem] text-[#ff6b6b]">{{ error.message }}</p>
+                    {% endfor %}
+                </div>
+                <div>
+                    {{ form_label(profileForm.phone, null, {'label_attr': {'class': _self.label_class()}}) }}
+                    {{ form_widget(profileForm.phone, {'attr': {'class': _self.input_class(), 'placeholder': '+33 6 12 34 56 78'}}) }}
+                </div>
+            </div>
+
+            {# Photo URL #}
+            <div>
+                {{ form_label(profileForm.photo, null, {'label_attr': {'class': _self.label_class()}}) }}
+                {{ form_widget(profileForm.photo, {'attr': {'class': _self.input_class(), 'placeholder': 'https://exemple.com/ma-photo.jpg'}}) }}
+                <p class="mt-1 text-[0.7rem] text-white/25">Lien direct vers une image. Utilisé comme avatar dans l'en-tête.</p>
+            </div>
+
+            {# Couleur préférée #}
+            <div>
+                {{ form_label(profileForm.favoriteColor, null, {'label_attr': {'class': _self.label_class()}}) }}
+                <div class="flex items-center gap-3">
+                    {{ form_widget(profileForm.favoriteColor, {'attr': {'class': 'h-10 w-14 cursor-pointer overflow-hidden rounded-xl border border-white/[0.08] bg-transparent'}}) }}
+                    <span class="text-[0.78rem] text-white/30">Personnalise la couleur de ton avatar</span>
+                </div>
+            </div>
+
+            <button type="submit"
+                    class="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#ff3b30] to-[#ff6b35] py-3 text-[0.9rem] font-semibold text-white shadow-lg shadow-[#ff3b30]/20 transition-all hover:scale-[1.01] hover:shadow-xl hover:shadow-[#ff3b30]/30">
+                <i class="fa-solid fa-floppy-disk text-sm"></i>
+                Sauvegarder les modifications
+            </button>
+
+        {{ form_end(profileForm) }}
+    </div>
+
+    {# ── Sécurité ── #}
+    <div class="animate-fade-up delay-200 rounded-2xl border border-white/[0.07] bg-[#111118] p-6">
+
+        <div class="mb-6 flex items-center gap-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#4a9eff]/20 bg-[#4a9eff]/10">
+                <i class="fa-solid fa-lock text-sm text-[#4a9eff]"></i>
+            </div>
+            <h2 class="font-heading text-lg font-bold text-white">Sécurité</h2>
+        </div>
+
+        <form method="post" action="{{ path('app_profile_password') }}" class="flex flex-col gap-5" novalidate>
+            <input type="hidden" name="_token" value="{{ csrf_token('profile_password') }}">
+
+            <div>
+                <label class="{{ _self.label_class() }}">Mot de passe actuel</label>
+                <input type="password" name="current_password" required autocomplete="current-password"
+                       class="w-full rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-2.5 text-[0.875rem] text-[#f0f0f5] outline-none transition-all focus:border-[#4a9eff]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#4a9eff]/[0.07]">
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                    <label class="{{ _self.label_class() }}">Nouveau mot de passe</label>
+                    <input type="password" name="new_password" required autocomplete="new-password"
+                           class="w-full rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-2.5 text-[0.875rem] text-[#f0f0f5] outline-none transition-all focus:border-[#4a9eff]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#4a9eff]/[0.07]">
+                </div>
+                <div>
+                    <label class="{{ _self.label_class() }}">Confirmer</label>
+                    <input type="password" name="confirm_password" required autocomplete="new-password"
+                           class="w-full rounded-xl border border-white/[0.08] bg-white/[0.035] px-4 py-2.5 text-[0.875rem] text-[#f0f0f5] outline-none transition-all focus:border-[#4a9eff]/50 focus:bg-white/[0.055] focus:ring-2 focus:ring-[#4a9eff]/[0.07]">
+                </div>
+            </div>
+
+            <button type="submit"
+                    class="flex w-full items-center justify-center gap-2 rounded-xl border border-[#4a9eff]/20 bg-[#4a9eff]/10 py-3 text-[0.9rem] font-semibold text-[#4a9eff] transition-all hover:border-[#4a9eff]/30 hover:bg-[#4a9eff]/20">
+                <i class="fa-solid fa-key text-sm"></i>
+                Changer le mot de passe
+            </button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

@@ -4,10 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Generation;
 use App\Entity\Tool;
+use App\Repository\GenerationRepository;
 use App\Repository\ToolRepository;
 use App\Security\ToolVoter;
 use App\Service\PdfGeneratorService;
 use Doctrine\ORM\EntityManagerInterface;
+use League\CommonMark\CommonMarkConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,7 +31,7 @@ class PdfController extends AbstractController
 
     #[Route('/tools/{id}', name: 'app_tool_convert')]
     #[IsGranted('ROLE_USER')]
-    public function convert(Tool $tool, Request $request, PdfGeneratorService $pdfGenerator, EntityManagerInterface $em): Response
+    public function convert(Tool $tool, Request $request, PdfGeneratorService $pdfGenerator, EntityManagerInterface $em, GenerationRepository $generationRepository): Response
     {
         if (!$this->isGranted(ToolVoter::ACCESS, $tool)) {
             $this->addFlash('error', 'Votre plan actuel ne donne pas accès à cet outil.');
@@ -39,6 +41,19 @@ class PdfController extends AbstractController
         $error = null;
 
         if ($request->isMethod('POST')) {
+            $user  = $this->getUser();
+            $limit = $user->getPlan()->getUsageLimit();
+
+            if ($limit !== null) {
+                $today      = new \DateTimeImmutable('today');
+                $tomorrow   = $today->modify('+1 day');
+                $usedToday  = $generationRepository->countByUserOnDate($user, $today, $tomorrow);
+
+                if ($usedToday >= $limit) {
+                    $error = sprintf('Vous avez atteint la limite de %d génération(s) par jour incluse dans votre abonnement.', $limit);
+                    return $this->render('pdf/convert.html.twig', ['tool' => $tool, 'error' => $error]);
+                }
+            }
             try {
                 $isUrlTool   = str_contains($tool->getName(), 'URL') || str_contains($tool->getName(), 'Capture');
                 $isMergeTool = str_contains($tool->getName(), 'Fusionner');
@@ -70,13 +85,18 @@ class PdfController extends AbstractController
                             'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
                             'odt', 'ods', 'odp', 'rtf', 'csv', 'txt',
                             'png', 'jpg', 'jpeg', 'webp', 'svg',
-                            'md', 'markdown',
                         ];
 
                         if ($extension === 'pdf') {
                             $pdfContent = $pdfGenerator->convertToPdfA(
                                 $uploadedFile->getPathname(),
                                 $uploadedFile->getClientOriginalName()
+                            );
+                        } elseif ($extension === 'md' || $extension === 'markdown') {
+                            $converter = new CommonMarkConverter();
+                            $html = $converter->convert(file_get_contents($uploadedFile->getPathname()))->getContent();
+                            $pdfContent = $pdfGenerator->generatePdfFromHtml(
+                                '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.6}pre{background:#f4f4f4;padding:1em;overflow-x:auto}code{background:#f4f4f4;padding:.2em .4em;border-radius:3px}</style></head><body>' . $html . '</body></html>'
                             );
                         } elseif (in_array($extension, $libreOfficeExtensions, true)) {
                             $pdfContent = $pdfGenerator->generatePdfFromOffice(
