@@ -35,12 +35,7 @@ class ProfileFormType extends AbstractType
                 'required'   => false,
                 'empty_data' => null,
             ])
-            ->add('photo', TextType::class, [
-                'label'      => 'Photo de profil (URL)',
-                'required'   => false,
-                'empty_data' => null,
-            ])
-            ->add('favoriteColor', ColorType::class, [
+->add('favoriteColor', ColorType::class, [
                 'label'    => 'Couleur préférée',
                 'required' => false,
             ])

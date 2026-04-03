@@ -1,5 +1,6 @@
 {
   "devDependencies": {
-    "@babel/preset-react": "^7.28.5"
+    "@babel/preset-react": "^7.28.5",
+    "cypress": "^15.13.0"
   }
 }

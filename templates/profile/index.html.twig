@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon profil — PDFactory{% endblock %}
+{% block title %}Mon profil — polypdf{% endblock %}
 
 {% block body %}
 <div class="mx-auto max-w-3xl px-6 py-12 lg:py-16">
@@ -112,14 +112,7 @@
                 </div>
             </div>
 
-            {# Photo URL #}
-            <div>
-                {{ form_label(profileForm.photo, null, {'label_attr': {'class': _self.label_class()}}) }}
-                {{ form_widget(profileForm.photo, {'attr': {'class': _self.input_class(), 'placeholder': 'https://exemple.com/ma-photo.jpg'}}) }}
-                <p class="mt-1 text-[0.7rem] text-white/25">Lien direct vers une image. Utilisé comme avatar dans l'en-tête.</p>
-            </div>
-
-            {# Couleur préférée #}
+{# Couleur préférée #}
             <div>
                 {{ form_label(profileForm.favoriteColor, null, {'label_attr': {'class': _self.label_class()}}) }}
                 <div class="flex items-center gap-3">

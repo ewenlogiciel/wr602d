@@ -4,11 +4,15 @@ namespace App\DataFixtures;
 
 use App\Entity\Plan;
 use App\Entity\Tool;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    public function __construct(private UserPasswordHasherInterface $hasher) {}
+
     public function load(ObjectManager $manager): void
     {
         // ══════════════════════════════════════════
@@ -56,7 +60,16 @@ class AppFixtures extends Fixture
 
             // ── Disponibles sur FREE (et donc tous les plans) ──────────────
             [
+                'name'        => 'Éditeur WYSIWYG',
+                'slug'        => 'wysiwyg',
+                'icon'        => 'fa-solid fa-pen-nib',
+                'description' => 'Rédigez et mettez en forme votre contenu directement dans le navigateur, puis exportez en PDF.',
+                'color'       => '#10b981',
+                'plans'       => [$planFree, $planBasic, $planPremium],
+            ],
+            [
                 'name'        => 'URL vers PDF',
+                'slug'        => 'url',
                 'icon'        => 'fa-solid fa-globe',
                 'description' => 'Convertit n\'importe quelle URL en PDF fidèle, rendu via Chromium.',
                 'color'       => '#4a9eff',
@@ -64,6 +77,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'HTML vers PDF',
+                'slug'        => 'html',
                 'icon'        => 'fa-solid fa-code',
                 'description' => 'Transforme un fichier HTML (et ses assets CSS/JS) en document PDF.',
                 'color'       => '#ff6b35',
@@ -71,6 +85,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'Markdown vers PDF',
+                'slug'        => 'markdown',
                 'icon'        => 'fa-solid fa-hashtag',
                 'description' => 'Convertit un fichier Markdown en PDF structuré et lisible.',
                 'color'       => '#a78bfa',
@@ -80,6 +95,7 @@ class AppFixtures extends Fixture
             // ── Disponibles sur BASIC et PREMIUM ──────────────────────────
             [
                 'name'        => 'Word vers PDF',
+                'slug'        => 'word',
                 'icon'        => 'fa-solid fa-file-word',
                 'description' => 'Convertit les fichiers .docx et .doc en PDF via LibreOffice.',
                 'color'       => '#2b7cd3',
@@ -87,6 +103,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'Excel vers PDF',
+                'slug'        => 'excel',
                 'icon'        => 'fa-solid fa-file-excel',
                 'description' => 'Convertit les feuilles de calcul .xlsx et .xls en PDF.',
                 'color'       => '#1e7e45',
@@ -94,6 +111,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'PowerPoint vers PDF',
+                'slug'        => 'powerpoint',
                 'icon'        => 'fa-solid fa-file-powerpoint',
                 'description' => 'Convertit les présentations .pptx et .ppt en PDF.',
                 'color'       => '#c43e1c',
@@ -101,6 +119,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'Texte brut vers PDF',
+                'slug'        => 'texte',
                 'icon'        => 'fa-solid fa-file-lines',
                 'description' => 'Convertit les fichiers .txt en PDF avec mise en forme propre.',
                 'color'       => '#6b7280',
@@ -110,6 +129,7 @@ class AppFixtures extends Fixture
             // ── Disponibles sur PREMIUM uniquement ────────────────────────
             [
                 'name'        => 'ODT vers PDF',
+                'slug'        => 'odt',
                 'icon'        => 'fa-solid fa-file',
                 'description' => 'Convertit les documents LibreOffice Writer (.odt) en PDF.',
                 'color'       => '#1a73e8',
@@ -117,6 +137,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'ODS vers PDF',
+                'slug'        => 'ods',
                 'icon'        => 'fa-solid fa-table',
                 'description' => 'Convertit les feuilles LibreOffice Calc (.ods) en PDF.',
                 'color'       => '#188038',
@@ -124,6 +145,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'ODP vers PDF',
+                'slug'        => 'odp',
                 'icon'        => 'fa-solid fa-file-image',
                 'description' => 'Convertit les présentations LibreOffice Impress (.odp) en PDF.',
                 'color'       => '#b5370a',
@@ -131,6 +153,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'RTF vers PDF',
+                'slug'        => 'rtf',
                 'icon'        => 'fa-solid fa-align-left',
                 'description' => 'Convertit les fichiers Rich Text Format (.rtf) en PDF.',
                 'color'       => '#7c3aed',
@@ -138,6 +161,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'CSV vers PDF',
+                'slug'        => 'csv',
                 'icon'        => 'fa-solid fa-file-csv',
                 'description' => 'Convertit les fichiers de données .csv en tableau PDF.',
                 'color'       => '#0d9488',
@@ -145,6 +169,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'Image vers PDF',
+                'slug'        => 'image',
                 'icon'        => 'fa-solid fa-image',
                 'description' => 'Convertit les images .png, .jpg, .jpeg en document PDF.',
                 'color'       => '#db2777',
@@ -152,6 +177,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'SVG vers PDF',
+                'slug'        => 'svg',
                 'icon'        => 'fa-solid fa-bezier-curve',
                 'description' => 'Convertit les graphiques vectoriels .svg en PDF haute qualité.',
                 'color'       => '#d97706',
@@ -159,6 +185,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'Fusionner des PDF',
+                'slug'        => 'fusionner',
                 'icon'        => 'fa-solid fa-layer-group',
                 'description' => 'Fusionne plusieurs fichiers PDF en un seul document.',
                 'color'       => '#ff3b30',
@@ -166,6 +193,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'PDF vers PDF/A',
+                'slug'        => 'pdfa',
                 'icon'        => 'fa-solid fa-shield-halved',
                 'description' => 'Convertit un PDF en format d\'archivage longue durée PDF/A.',
                 'color'       => '#4f46e5',
@@ -173,6 +201,7 @@ class AppFixtures extends Fixture
             ],
             [
                 'name'        => 'Capture d\'écran URL',
+                'slug'        => 'capture',
                 'icon'        => 'fa-solid fa-camera',
                 'description' => 'Génère une capture d\'écran PNG/JPEG d\'une page web via Chromium.',
                 'color'       => '#0891b2',
@@ -183,6 +212,7 @@ class AppFixtures extends Fixture
         foreach ($tools as $data) {
             $tool = new Tool();
             $tool->setName($data['name']);
+            $tool->setSlug($data['slug']);
             $tool->setIcon($data['icon']);
             $tool->setDescription($data['description']);
             $tool->setColor($data['color']);
@@ -194,6 +224,20 @@ class AppFixtures extends Fixture
 
             $manager->persist($tool);
         }
+
+        // ══════════════════════════════════════════
+        // UTILISATEUR DE TEST
+        // ══════════════════════════════════════════
+
+        $testUser = new User();
+        $testUser->setEmail('test@gmail.com');
+        $testUser->setFirstname('Test');
+        $testUser->setLastname('User');
+        $testUser->setDob(new \DateTimeImmutable('1990-01-01'));
+        $testUser->setIsVerified(true);
+        $testUser->setPlan($planBasic);
+        $testUser->setPassword($this->hasher->hashPassword($testUser, '123456'));
+        $manager->persist($testUser);
 
         $manager->flush();
     }
