@@ -13,6 +13,7 @@ use League\CommonMark\CommonMarkConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -29,9 +30,9 @@ class PdfController extends AbstractController
         ]);
     }
 
-    #[Route('/tools/{id}', name: 'app_tool_convert')]
+    #[Route('/convert/{slug}', name: 'app_tool_convert')]
     #[IsGranted('ROLE_USER')]
-    public function convert(Tool $tool, Request $request, PdfGeneratorService $pdfGenerator, EntityManagerInterface $em, GenerationRepository $generationRepository): Response
+    public function convert(#[MapEntity(mapping: ['slug' => 'slug'])] Tool $tool, Request $request, PdfGeneratorService $pdfGenerator, EntityManagerInterface $em, GenerationRepository $generationRepository): Response
     {
         if (!$this->isGranted(ToolVoter::ACCESS, $tool)) {
             $this->addFlash('error', 'Votre plan actuel ne donne pas accès à cet outil.');
@@ -55,12 +56,27 @@ class PdfController extends AbstractController
                 }
             }
             try {
-                $isUrlTool   = str_contains($tool->getName(), 'URL') || str_contains($tool->getName(), 'Capture');
-                $isMergeTool = str_contains($tool->getName(), 'Fusionner');
-                $pdfContent  = null;
-                $source      = null;
+                $isUrlTool     = str_contains($tool->getName(), 'URL') || str_contains($tool->getName(), 'Capture');
+                $isMergeTool   = str_contains($tool->getName(), 'Fusionner');
+                $isWysiwygTool = $tool->getSlug() === 'wysiwyg';
+                $pdfContent    = null;
+                $source        = null;
 
-                if ($isUrlTool) {
+                if ($isWysiwygTool) {
+                    $htmlContent = $request->request->get('content', '');
+                    if ($htmlContent) {
+                        $source     = 'Éditeur WYSIWYG';
+                        $pdfContent = $pdfGenerator->generatePdfFromHtml(
+                            '<!DOCTYPE html><html><head><meta charset="utf-8">'
+                            . '<style>body{font-family:Georgia,serif;max-width:800px;margin:40px auto;padding:0 40px;line-height:1.7;color:#1a1a1a}'
+                            . 'h1,h2,h3{font-family:Arial,sans-serif;margin-top:1.4em}'
+                            . 'ul,ol{padding-left:1.5em}blockquote{border-left:3px solid #ccc;margin:0;padding-left:1em;color:#555}'
+                            . 'pre{background:#f4f4f4;padding:1em;overflow-x:auto}code{background:#f4f4f4;padding:.2em .4em}'
+                            . 'img{max-width:100%}</style>'
+                            . '</head><body>' . $htmlContent . '</body></html>'
+                        );
+                    }
+                } elseif ($isUrlTool) {
                     $source = $request->request->get('url');
                     if ($source) {
                         $pdfContent = $pdfGenerator->generatePdfFromUrl($source);

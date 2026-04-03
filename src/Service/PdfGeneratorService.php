@@ -67,7 +67,7 @@ class PdfGeneratorService
             'ignore_errors' => true,
         ]]);
 
-        $result = file_get_contents($this->gotenbergUrl . $route, false, $ctx);
+        $result = @file_get_contents($this->gotenbergUrl . $route, false, $ctx);
 
         if ($result === false) {
             throw new \RuntimeException("Impossible de joindre Gotenberg ({$this->gotenbergUrl}{$route})");
