@@ -14,6 +14,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
@@ -119,7 +120,18 @@ class RegistrationController extends AbstractController
         $user->setIsVerified(true);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Votre adresse e-mail a été vérifiée. Vous pouvez maintenant vous connecter !');
+        $plan = $user->getPlan();
+        if ($plan !== null && $plan->getStripePriceId() !== null) {
+            $checkoutUrl = $this->generateUrl(
+                'app_payment_checkout',
+                ['id' => $plan->getId()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+            $request->getSession()->set('_security.main.target_path', $checkoutUrl);
+            $this->addFlash('success', 'Votre adresse e-mail a été vérifiée. Connectez-vous pour finaliser votre abonnement.');
+        } else {
+            $this->addFlash('success', 'Votre adresse e-mail a été vérifiée. Vous pouvez maintenant vous connecter !');
+        }
 
         return $this->redirectToRoute('app_login');
     }

@@ -4,13 +4,24 @@ namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class HomeControllerTest extends WebTestCase
+class HomeControllerTest extends WebTestCase
 {
-    public function testIndex(): void
+    public function testHomepageIsAccessible(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/home');
+        $client->request('GET', '/');
 
-        self::assertResponseIsSuccessful();
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testHomepageContainsPlans(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('FREE', $crawler->filter('body')->text());
+        $this->assertStringContainsString('BASIC', $crawler->filter('body')->text());
+        $this->assertStringContainsString('PREMIUM', $crawler->filter('body')->text());
     }
 }

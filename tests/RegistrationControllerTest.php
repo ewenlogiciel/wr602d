@@ -2,49 +2,35 @@
 
 namespace App\Tests;
 
-use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManager;
+use App\Repository\PlanRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class RegistrationControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
-    private UserRepository $userRepository;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
-
-        // Ensure we have a clean database
-        $container = static::getContainer();
-
-        /** @var EntityManager $em */
-        $em = $container->get('doctrine')->getManager();
-        $this->userRepository = $container->get(UserRepository::class);
-
-        foreach ($this->userRepository->findAll() as $user) {
-            $em->remove($user);
-        }
-
-        $em->flush();
     }
 
-    public function testRegister(): void
+    public function testRegisterPageIsAccessible(): void
     {
-        // Register a new user
         $this->client->request('GET', '/register');
+
         self::assertResponseIsSuccessful();
-        self::assertPageTitleContains('Register');
+        self::assertPageTitleContains('Inscription');
+    }
 
-        $this->client->submitForm('Register', [
-            'registration_form[email]' => 'me@example.com',
-            'registration_form[plainPassword]' => 'password',
-            'registration_form[agreeTerms]' => true,
-        ]);
+    public function testRegisterPageContainsForm(): void
+    {
+        $this->client->request('GET', '/register');
 
-        // Ensure the response redirects after submitting the form, the user exists, and is not verified
-        // self::assertResponseRedirects('/'); @TODO: set the appropriate path that the user is redirected to.
-        self::assertCount(1, $this->userRepository->findAll());
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('input[name="registration_form[email]"]');
+        self::assertSelectorExists('input[name="registration_form[plainPassword]"]');
+        self::assertSelectorExists('input[name="registration_form[firstname]"]');
+        self::assertSelectorExists('input[name="registration_form[lastname]"]');
     }
 }

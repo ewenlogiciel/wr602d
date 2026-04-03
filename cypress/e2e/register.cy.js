@@ -1,0 +1,36 @@
+describe('Inscription', () => {
+    it('affiche le formulaire d\'inscription avec les plans', () => {
+        cy.visit('/register')
+        cy.get('input[name="registration_form[email]"]').should('be.visible')
+        cy.get('input[name="registration_form[plainPassword]"]').should('be.visible')
+        cy.contains('FREE').should('be.visible')
+        cy.contains('BASIC').should('be.visible')
+        cy.contains('PREMIUM').should('be.visible')
+    })
+
+    it('affiche une erreur si l\'email est déjà utilisé', () => {
+        cy.visit('/register')
+        cy.get('input[name="registration_form[email]"]').type('test@gmail.com')
+        cy.get('input[name="registration_form[firstname]"]').type('Test')
+        cy.get('input[name="registration_form[lastname]"]').type('User')
+        cy.get('input[name="registration_form[dob]"]').type('1990-01-01')
+        cy.get('input[name="registration_form[plainPassword]"]').type('123456')
+        cy.get('input[name="registration_form[agreeTerms]"]').check({ force: true })
+        cy.get('input[type="radio"]').first().check({ force: true })
+        cy.get('button[type="submit"]').click()
+        cy.contains(/déjà utilisé|already/i).should('exist')
+    })
+
+    it('affiche une erreur si le mot de passe est trop court', () => {
+        cy.visit('/register')
+        cy.get('input[name="registration_form[email]"]').type('nouveau@test.com')
+        cy.get('input[name="registration_form[firstname]"]').type('Test')
+        cy.get('input[name="registration_form[lastname]"]').type('User')
+        cy.get('input[name="registration_form[dob]"]').type('1990-01-01')
+        cy.get('input[name="registration_form[plainPassword]"]').type('abc')
+        cy.get('input[name="registration_form[agreeTerms]"]').check({ force: true })
+        cy.get('input[type="radio"]').first().check({ force: true })
+        cy.get('button[type="submit"]').click()
+        cy.contains(/at least 6|6 characters|6 caractères/i).should('exist')
+    })
+})

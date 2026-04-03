@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ tool.name }} — PDFactory{% endblock %}
+{% block title %}{{ tool.name }} — polypdf{% endblock %}
 
 {% block body %}
 <div class="mx-auto max-w-3xl px-6 py-12 lg:py-16">
@@ -44,16 +44,42 @@
     <div class="animate-fade-up delay-200 rounded-2xl border border-white/[0.07] bg-[#111118] p-8">
 
         {# Détermination du type d'entrée #}
-        {% set isUrlTool   = 'URL' in tool.name or 'Capture' in tool.name %}
-        {% set isTextTool  = 'HTML' in tool.name or 'Markdown' in tool.name %}
-        {% set isMergeTool = 'Fusionner' in tool.name %}
-        {% set isFileTool  = not isUrlTool and not isTextTool and not isMergeTool %}
+        {% set isUrlTool     = 'URL' in tool.name or 'Capture' in tool.name %}
+        {% set isTextTool    = 'HTML' in tool.name or 'Markdown' in tool.name %}
+        {% set isMergeTool   = 'Fusionner' in tool.name %}
+        {% set isWysiwygTool = tool.slug == 'wysiwyg' %}
+        {% set isFileTool    = not isUrlTool and not isTextTool and not isMergeTool and not isWysiwygTool %}
 
         <form method="post"
               enctype="{{ isFileTool or isTextTool or isMergeTool ? 'multipart/form-data' : 'application/x-www-form-urlencoded' }}"
               data-turbo="false">
 
-            {% if isUrlTool %}
+            {% if isWysiwygTool %}
+                {# ── Éditeur WYSIWYG ── #}
+                <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+                <style>
+                    .ql-toolbar { background:#1a1a24; border-color:rgba(255,255,255,.09) !important; border-radius:.75rem .75rem 0 0; }
+                    .ql-container { background:#13131d; border-color:rgba(255,255,255,.09) !important; border-radius:0 0 .75rem .75rem; min-height:320px; }
+                    .ql-editor { color:#e8e8f0; font-size:.9rem; min-height:300px; }
+                    .ql-editor.ql-blank::before { color:rgba(255,255,255,.2); font-style:normal; }
+                    .ql-toolbar .ql-stroke { stroke:#9090a8; }
+                    .ql-toolbar .ql-fill  { fill:#9090a8; }
+                    .ql-toolbar .ql-picker-label { color:#9090a8; }
+                    .ql-toolbar button:hover .ql-stroke, .ql-toolbar .ql-active .ql-stroke { stroke:#fff; }
+                    .ql-toolbar button:hover .ql-fill,  .ql-toolbar .ql-active .ql-fill  { fill:#fff; }
+                    .ql-toolbar .ql-picker-options { background:#1a1a24; border-color:rgba(255,255,255,.09); }
+                    .ql-toolbar .ql-picker-item { color:#9090a8; }
+                </style>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-white/50">
+                        Contenu du document
+                    </label>
+                    <div id="quill-editor"></div>
+                    <input type="hidden" name="content" id="quill-content">
+                    <p class="text-[0.72rem] text-white/25">Mettez en forme votre texte puis cliquez sur Convertir.</p>
+                </div>
+
+            {% elseif isUrlTool %}
                 {# ── Formulaire URL ── #}
                 <div class="flex flex-col gap-1.5">
                     <label for="url"
@@ -127,6 +153,9 @@
                             </p>
                             <p class="mt-1 text-[0.72rem] text-white/25">
                                 .pdf uniquement — 2 fichiers minimum — max. 50 Mo chacun
+                            </p>
+                            <p class="mt-0.5 text-[0.7rem] text-white/20">
+                                Maintenez <kbd class="rounded bg-white/10 px-1 py-0.5 font-mono text-[0.65rem]">Ctrl</kbd> pour sélectionner plusieurs fichiers
                             </p>
                         </div>
                         <input type="file"
@@ -220,6 +249,80 @@
 </div>
 
 <script>
+    // Initialisation de l'éditeur Quill
+    const quillEditorEl = document.getElementById('quill-editor');
+    let quill = null;
+    if (quillEditorEl) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.quilljs.com/1.3.7/quill.min.js';
+        script.onload = () => {
+            quill = new Quill('#quill-editor', {
+                theme: 'snow',
+                placeholder: 'Commencez à rédiger votre document…',
+                modules: {
+                    toolbar: [
+                        [{ header: [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ color: [] }, { background: [] }],
+                        [{ list: 'ordered' }, { list: 'bullet' }],
+                        [{ align: [] }],
+                        ['blockquote', 'code-block'],
+                        ['link'],
+                        ['clean'],
+                    ],
+                },
+            });
+        };
+        document.head.appendChild(script);
+    }
+
+    // Ouverture du PDF dans un nouvel onglet
+    const convertForm = document.querySelector('form');
+    const submitBtn   = convertForm ? convertForm.querySelector('button[type="submit"]') : null;
+
+    if (convertForm && submitBtn) {
+        const originalHtml = submitBtn.innerHTML;
+
+        convertForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Copie le HTML de Quill dans le champ caché
+            const quillContent = document.getElementById('quill-content');
+            if (quill && quillContent) {
+                quillContent.value = quill.root.innerHTML;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Conversion en cours…';
+
+            try {
+                const res = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: new FormData(convertForm),
+                });
+
+                const contentType = res.headers.get('Content-Type') || '';
+
+                if (contentType.includes('application/pdf')) {
+                    const blob = await res.blob();
+                    window.open(URL.createObjectURL(blob), '_blank');
+                } else {
+                    // Erreur renvoyée par le serveur : remplace la page
+                    const html = await res.text();
+                    document.open();
+                    document.write(html);
+                    document.close();
+                    return;
+                }
+            } catch (err) {
+                console.error('Erreur lors de la conversion :', err);
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalHtml;
+        });
+    }
+
     // Affiche le nom du fichier sélectionné (outil single-file)
     const fileInput = document.getElementById('file');
     const fileName  = document.getElementById('file-name');
@@ -235,12 +338,38 @@
     // Affiche le nombre de fichiers sélectionnés (outil fusion)
     const filesInput = document.getElementById('files');
     const filesCount = document.getElementById('files-count');
+    const filesDropZone = filesInput ? filesInput.closest('label') : null;
+
+    function updateFilesCount() {
+        const n = filesInput.files.length;
+        if (n > 0) {
+            filesCount.textContent = n + ' fichier' + (n > 1 ? 's' : '') + ' sélectionné' + (n > 1 ? 's' : '');
+            filesCount.classList.remove('hidden');
+        }
+    }
+
     if (filesInput && filesCount) {
-        filesInput.addEventListener('change', () => {
-            const n = filesInput.files.length;
-            if (n > 0) {
-                filesCount.textContent = n + ' fichier' + (n > 1 ? 's' : '') + ' sélectionné' + (n > 1 ? 's' : '');
-                filesCount.classList.remove('hidden');
+        filesInput.addEventListener('change', updateFilesCount);
+    }
+
+    if (filesDropZone && filesInput) {
+        filesDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            filesDropZone.classList.add('border-white/40', 'bg-white/[0.06]');
+        });
+        filesDropZone.addEventListener('dragleave', () => {
+            filesDropZone.classList.remove('border-white/40', 'bg-white/[0.06]');
+        });
+        filesDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            filesDropZone.classList.remove('border-white/40', 'bg-white/[0.06]');
+            const dt = new DataTransfer();
+            Array.from(e.dataTransfer.files)
+                .filter(f => f.type === 'application/pdf' || f.name.endsWith('.pdf'))
+                .forEach(f => dt.items.add(f));
+            if (dt.files.length > 0) {
+                filesInput.files = dt.files;
+                updateFilesCount();
             }
         });
     }
